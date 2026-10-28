@@ -1,0 +1,22 @@
+2026-10-28 10:41:18,875 | ERROR | Falha ao ler arquivo Solicitacao_Evento_Avulso_Letiva.2026-10-27_14.04.xlsx
+Traceback (most recent call last):
+  File "C:\Users\diogo.jooliveira\Grupo Marista\Diretório Controle Acadêmico - Documentos\10_Analistas\10.10_Diogo\17 - Evento Avulso Automação\app\orchestrator.py", line 48, in run
+    loaded, warnings = read_requests(file, folder.name, folder.request_type, profile, input_dir, execution_id, token)
+                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\diogo.jooliveira\Grupo Marista\Diretório Controle Acadêmico - Documentos\10_Analistas\10.10_Diogo\17 - Evento Avulso Automação\app\reader.py", line 19, in read_requests
+    sheet, fields = resolve_profile_sheet(workbook, profile)
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\diogo.jooliveira\Grupo Marista\Diretório Controle Acadêmico - Documentos\10_Analistas\10.10_Diogo\17 - Evento Avulso Automação\app\profiles.py", line 36, in resolve_profile_sheet
+    raise ValueError(f"Perfil '{profile.name}' não reconheceu nenhuma aba do arquivo.")
+ValueError: Perfil 'Novo template - Evento Avulso' não reconheceu nenhuma aba do arquivo.
+2026-10-28 10:41:18,885 | ERROR | Falha ao ler arquivo Solicitacao_Evento_Avulso_Letiva.2026-10-20_10.12.xlsx
+Traceback (most recent call last):
+  File "C:\Users\diogo.jooliveira\Grupo Marista\Diretório Controle Acadêmico - Documentos\10_Analistas\10.10_Diogo\17 - Evento Avulso Automação\app\orchestrator.py", line 48, in run
+    loaded, warnings = read_requests(file, folder.name, folder.request_type, profile, input_dir, execution_id, token)
+                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\diogo.jooliveira\Grupo Marista\Diretório Controle Acadêmico - Documentos\10_Analistas\10.10_Diogo\17 - Evento Avulso Automação\app\reader.py", line 19, in read_requests
+    sheet, fields = resolve_profile_sheet(workbook, profile)
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\diogo.jooliveira\Grupo Marista\Diretório Controle Acadêmico - Documentos\10_Analistas\10.10_Diogo\17 - Evento Avulso Automação\app\profiles.py", line 36, in resolve_profile_sheet
+    raise ValueError(f"Perfil '{profile.name}' não reconheceu nenhuma aba do arquivo.")
+ValueError: Perfil 'Novo template - Evento Avulso' não reconheceu nenhuma aba do arquivo.

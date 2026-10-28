@@ -6,7 +6,7 @@ from pathlib import Path
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.formatting.rule import FormulaRule
-from openpyxl.styles import Font, PatternFill
+from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
@@ -32,17 +32,17 @@ def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -
         row = [safe_text(record.values.get(h, "")) for h in data_headers] + [record.result_type, record.result_message, record.source_file, record.relative_path, record.source_sheet, record.source_row, record.source_folder, record.profile_id, record.record_id, record.execution_id]
         ws.append(row)
     ws.freeze_panes = "A2"; ws.auto_filter.ref = ws.dimensions
-    result_col = get_column_letter(headers.index(RESULT_MESSAGE) + 1)
     for row in range(2, ws.max_row + 1):
-        ws.cell(row, headers.index(RESULT_TYPE) + 1).alignment = ws.cell(row, headers.index(RESULT_MESSAGE) + 1).alignment.copy(wrap_text=True, vertical="top")
+        ws.cell(row, headers.index(RESULT_TYPE) + 1).alignment = Alignment(wrap_text=True, vertical="top")
         text = str(ws.cell(row, headers.index(RESULT_MESSAGE) + 1).value or "")
-        ws.cell(row, headers.index(RESULT_MESSAGE) + 1).alignment = ws.cell(row, headers.index(RESULT_MESSAGE) + 1).alignment.copy(wrap_text=True, vertical="top")
+        ws.cell(row, headers.index(RESULT_MESSAGE) + 1).alignment = Alignment(wrap_text=True, vertical="top")
         if text.startswith("Conflito"): fill = RED
         elif text.startswith("Sem conflito"): fill = GREEN
         else: fill = YELLOW
         for cell in ws[row]: cell.fill = fill
     for index, header in enumerate(headers, 1):
-        length = max(len(str(header)), *(len(str(ws.cell(row, index).value or "")) for row in range(2, min(ws.max_row, 100) + 1)))
+        lengths = [len(str(header))] + [len(str(ws.cell(row, index).value or "")) for row in range(2, min(ws.max_row, 100) + 1)]
+        length = max(lengths)
         ws.column_dimensions[get_column_letter(index)].width = min(max(length + 2, 12), 55)
     for row in ws.iter_rows(min_row=2):
         for cell in row:

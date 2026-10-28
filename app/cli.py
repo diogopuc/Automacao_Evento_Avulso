@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
 from .config import load_config, profiles
@@ -18,7 +19,7 @@ def main():
     args = parser.parse_args(); config = load_config(); profile = next(p for p in profiles(config) if p.id == args.perfil)
     logger = configure_logging(Path(args.saida) / "logs", "cli")
     coverage = Coverage(bool(args.cobertura_inicio and args.cobertura_fim), parse_date(args.cobertura_inicio), parse_date(args.cobertura_fim))
-    output = Processor(config, logger, lambda stage, pct, item: print(f"{pct:3}% {stage} {item or ''}")).run(Path(args.entrada), Path(args.saida), profile, args.fonte, Path(args.arquivo_dw) if args.arquivo_dw else None, coverage, CancellationToken())
+    output = Processor(config, logger, lambda stage, pct, item: print(f"{pct if pct is not None else '?':>3}% {stage} {item or ''}")).run(Path(args.entrada), Path(args.saida), profile, args.fonte, Path(args.arquivo_dw) if args.arquivo_dw else None, coverage, CancellationToken(), os.environ.get("EVENTOS_AVULSOS_SQL_PASSWORD"))
     print(output)
 
 if __name__ == "__main__": main()

@@ -90,12 +90,12 @@ class Application(ttk.Frame):
         except Exception as exc: messagebox.showerror("Prévia", str(exc))
     def test_connection(self):
         def worker():
-            try: test_sql_connection(self.config_data["sql"]); self.events.put(("done", (None, "Conexão SQL validada.")))
+            try: test_sql_connection(self.config_data["sql"], os.environ.get("EVENTOS_AVULSOS_SQL_PASSWORD")); self.events.put(("done", (None, "Conexão SQL validada.")))
             except Exception as exc: self.events.put(("done", (None, f"Falha de conexão: {exc}")))
         threading.Thread(target=worker, daemon=True).start()
     def configure_sql(self):
         dialog = tk.Toplevel(self); dialog.title("Configuração SQL Server"); dialog.transient(self.master); dialog.grab_set(); dialog.resizable(False, False)
-        fields = [("server", "Servidor"), ("database", "Banco"), ("authentication", "Autenticação (windows/sql)"), ("odbc_driver", "Driver ODBC"), ("connect_timeout_seconds", "Timeout conexão (s)"), ("query_timeout_seconds", "Timeout consulta (s)")]
+        fields = [("server", "Servidor"), ("database", "Banco"), ("authentication", "Autenticação (windows/sql)"), ("username", "Usuário SQL (se aplicável)"), ("odbc_driver", "Driver ODBC"), ("connect_timeout_seconds", "Timeout conexão (s)"), ("query_timeout_seconds", "Timeout consulta (s)")]
         variables = {}; sql = self.config_data["sql"]
         for row, (key, label) in enumerate(fields):
             ttk.Label(dialog, text=label).grid(row=row, column=0, sticky="w", padx=8, pady=4)
@@ -118,7 +118,7 @@ class Application(ttk.Frame):
             logger = configure_logging(Path(self.output_var.get()) / "logs", execution_id, lambda msg: self.events.put(("log", msg)))
             try:
                 processor = Processor(self.config_data, logger, lambda stage, pct, current: self.events.put(("progress", (stage, pct, current))))
-                result = processor.run(Path(self.input_var.get()), Path(self.output_var.get()), self._profile(), self.source_var.get(), Path(self.dw_file_var.get()) if self.dw_file_var.get() else None, self._coverage(), self.token)
+                result = processor.run(Path(self.input_var.get()), Path(self.output_var.get()), self._profile(), self.source_var.get(), Path(self.dw_file_var.get()) if self.dw_file_var.get() else None, self._coverage(), self.token, os.environ.get("EVENTOS_AVULSOS_SQL_PASSWORD"))
                 summary = processor.last_summary
                 message = f"{summary.status}. Letivas: {summary.letivas}; não letivas: {summary.nao_letivas}; conflitos: {summary.conflicts}; sem conflito: {summary.no_conflicts}; não verificados: {summary.not_verified}. Relatório: {result.name}"
                 self.events.put(("done", (result, message)))

@@ -10,7 +10,7 @@ Aplicação desktop em português para consolidar solicitações de Eventos Avul
 
 1. Instale Python 3.11+ e marque **Add Python to PATH**.
 2. No PowerShell, dentro desta pasta, execute `py -3.11 -m venv .venv`, `.\.venv\Scripts\Activate.ps1` e `pip install -r requirements.txt`.
-3. Copie `config.example.json` para `config.json`. Não armazene senha nele. Para credencial SQL, prefira autenticação integrada ou uma variável de ambiente usada por uma futura camada de segredo.
+3. Copie `config.example.json` para `config.json`. Não armazene senha nele. Para autenticação SQL, informe somente o usuário na tela e, antes de abrir a aplicação, defina a senha com `$env:EVENTOS_AVULSOS_SQL_PASSWORD = "sua-senha"`. Para persistir a variável, execute `setx EVENTOS_AVULSOS_SQL_PASSWORD "sua-senha"` e reabra o terminal.
 4. Execute `python main.py`.
 
 Para criar o executável: `pyinstaller --noconfirm --windowed --name EventosAvulsos main.py`. Inclua `config.example.json` junto ao executável e crie `config.json` no mesmo diretório.

@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 
 from openpyxl import Workbook, load_workbook
-from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
@@ -28,7 +27,7 @@ def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -
     for record in records:
         row = [safe_text(record.values.get(h, "")) for h in data_headers] + [record.result_type, record.result_message]
         ws.append(row)
-    ws.freeze_panes = "A2"; ws.auto_filter.ref = ws.dimensions
+    ws.freeze_panes = "A2"
     for row in range(2, ws.max_row + 1):
         ws.cell(row, headers.index(RESULT_TYPE) + 1).alignment = Alignment(wrap_text=True, vertical="top")
         text = str(ws.cell(row, headers.index(RESULT_MESSAGE) + 1).value or "")
@@ -48,6 +47,8 @@ def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -
         table = Table(displayName=f"Tabela{title.replace(' ', '').replace('ã','a')}", ref=ws.dimensions)
         table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium2", showRowStripes=True)
         ws.add_table(table)
+    else:
+        ws.auto_filter.ref = ws.dimensions
 
 
 def _summary_sheet(workbook: Workbook, summary: RunSummary) -> None:

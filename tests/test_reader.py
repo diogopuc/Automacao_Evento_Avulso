@@ -32,12 +32,10 @@ def test_reader_rejects_ambiguous_template(tmp_path):
     else:
         raise AssertionError("O arquivo ambíguo deveria ser rejeitado")
 
-def test_reader_rejects_template_without_new_time_columns(tmp_path):
+def test_reader_consolidates_template_without_new_time_columns_as_not_verified(tmp_path):
     file = tmp_path / "antigo.xlsx"; wb = Workbook(); ws = wb.active; ws.title = "Solicitações"
-    ws.append(["" for _ in range(22)]); wb.save(file)
-    try:
-        read_requests(file, "1. LETIVA", "letiva", profile(), tmp_path, "exec", CancellationToken())
-    except ValueError as exc:
-        assert "não reconheceu" in str(exc)
-    else:
-        raise AssertionError("O template sem as colunas W/X deveria ser rejeitado")
+    row = ["" for _ in range(22)]; row[1], row[5] = "Matrícula", "Data"; ws.append(row)
+    row = ["" for _ in range(22)]; row[1], row[5] = "000123", date(2026,10,28); ws.append(row); wb.save(file)
+    records, _ = read_requests(file, "1. LETIVA", "letiva", profile(), tmp_path, "exec", CancellationToken())
+    assert records[0].matricula == "000123"
+    assert records[0].start_time is None and "Horário de início ou término ausente ou inválido" in records[0].issues

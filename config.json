@@ -100,13 +100,14 @@
     }
   ],
   "sql": {
-    "server": "",
+    "server": "sqldb-coe-pucpr.database.windows.net",
     "database": "sqldb-coe-pucpr-dw",
-    "authentication": "windows",
+    "authentication": "sql",
     "odbc_driver": "ODBC Driver 18 for SQL Server",
     "encrypt": true,
     "trust_server_certificate": false,
     "connect_timeout_seconds": 15,
-    "query_timeout_seconds": 90
+    "query_timeout_seconds": 90,
+    "username": "diogo.jooliveira@pucpr.br"
   }
 }

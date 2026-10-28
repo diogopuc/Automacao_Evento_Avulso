@@ -33,6 +33,8 @@ def read_requests(path: Path, folder_name: str, request_type: str, profile: Prof
             continue
         values = {safe_headers[index]: value for index, value in enumerate(raw) if index < len(safe_headers)}
         def cell_value(field):
+            if field not in fields:
+                return None
             index = fields[field] - 1
             return raw[index] if index < len(raw) else None
         record = RequestRecord(values=values, request_type=request_type, matricula=normalize_id(cell_value("matricula")), activity_date=parse_date(cell_value("data")), start_time=parse_time(cell_value("inicio")), end_time=parse_time(cell_value("fim")), source_file=path.name, relative_path=str(path.relative_to(root)), source_sheet=sheet.title, source_row=row_number, source_folder=folder_name, profile_id=profile.id, record_id=str(uuid4()), execution_id=execution_id)

@@ -1,6 +1,6 @@
 # Eventos Avulsos
 
-Aplicação desktop em português para consolidar solicitações de Eventos Avulsos e indicar conflitos com atividades docentes do DW. Ela lê apenas arquivos `xlsx` e `xlsm` diretamente nas pastas configuradas e nunca move, renomeia, exclui ou altera os arquivos de origem.
+Aplicação desktop em português para consolidar solicitações de Eventos Avulsos e indicar conflitos com atividades docentes de um Excel exportado da view. Ela lê apenas arquivos `xlsx` e `xlsm` diretamente nas pastas configuradas e nunca move, renomeia, exclui ou altera os arquivos de origem.
 
 ## Arquitetura
 
@@ -10,7 +10,7 @@ Aplicação desktop em português para consolidar solicitações de Eventos Avul
 
 1. Instale Python 3.11+ e marque **Add Python to PATH**.
 2. No PowerShell, dentro desta pasta, execute `py -3.11 -m venv .venv`, `.\.venv\Scripts\Activate.ps1` e `pip install -r requirements.txt`.
-3. Copie `config.example.json` para `config.json`. Não armazene senha nele. Para autenticação SQL, informe somente o usuário na tela e, antes de abrir a aplicação, defina a senha com `$env:EVENTOS_AVULSOS_SQL_PASSWORD = "sua-senha"`. Para persistir a variável, execute `setx EVENTOS_AVULSOS_SQL_PASSWORD "sua-senha"` e reabra o terminal.
+3. Copie `config.example.json` para `config.json`. Coloque o Excel exportado da view na raiz da automação com o nome `base_dw.xlsx`, ou selecione-o pela interface.
 4. Execute `python main.py`.
 
 Para criar o executável: `pyinstaller --noconfirm --windowed --name EventosAvulsos main.py`. Inclua `config.example.json` junto ao executável e crie `config.json` no mesmo diretório.
@@ -20,14 +20,13 @@ Para criar o executável: `pyinstaller --noconfirm --windowed --name EventosAvul
 1. Selecione o diretório que contém `1. LETIVA`, `2. NAO LETIVA` e, quando aplicável, as duas pastas históricas elegíveis.
 2. Use **Validar arquivos**. O relatório informa pastas ausentes, arquivos ignorados e arquivos sem registros. Subpastas, inclusive `2025`, `2026` e `ajustes`, não são percorridas.
 3. Escolha o perfil e use **Prévia do mapeamento** antes de executar. O perfil novo busca primeiro cabeçalhos conhecidos e só aceita as posições B, F, W e X quando o perfil explicitamente selecionado as configura. O perfil VBA é exclusivamente manual.
-4. Escolha somente consolidação, SQL Server ou arquivo exportado do DW. Para arquivo DW, informe o período de cobertura confirmado. Sem cobertura confirmada, os eventos não são declarados sem conflito.
+   Quando o arquivo possuir B e F, mas ainda não tiver W/X, a consolidação continuará e o registro será marcado como `Não verificado — horário de início ou término ausente ou inválido`.
+4. Escolha o arquivo exportado da view e informe o período de cobertura confirmado. Sem cobertura confirmada, os eventos não são declarados sem conflito.
 5. Clique **Executar**. Um novo arquivo é criado em `resultados`; a saída dentro de qualquer origem habilitada é bloqueada.
 
-## SQL Server e ODBC
+## Arquivo exportado da view
 
-Instale o [Microsoft ODBC Driver 18 for SQL Server](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server). Informe servidor, driver e método de autenticação em `config.json`. O botão **Testar conexão** executa somente `SELECT 1` e a consulta usa parâmetros, lotes de até 1.800 matrículas e apenas colunas necessárias. A consulta não filtra `STATUS`, nem grava ou altera objetos no DW.
-
-O servidor e o método de autenticação ainda são pendências de configuração. A aplicação não inventa credenciais, nem desativa validação de certificado por padrão.
+Exporte a view com as colunas `MATRICULA_ADP`, `DATA`, `HORARIO_INICIO HR Relogio`, `HORARIO_FIM HR Relogio`, `TIPO_ATIVIDADE` e `DISCIPLINA_ATIVIDADE_NOME`. Salve o arquivo na raiz como `base_dw.xlsx` ou escolha outro pelo botão **Selecionar arquivo**. O botão **Validar arquivo da view** confere a estrutura antes da execução.
 
 ## Perfis de template
 
@@ -41,8 +40,7 @@ Com as dependências instaladas, execute `python exemplos/gerar_dados_ficticios.
 
 ## Pendências objetivas
 
-- Endereço do servidor SQL Server e autenticação.
-- Confirmação de tipos SQL da view no ambiente.
+- Confirmação das colunas presentes no Excel exportado da view.
 - Nomes reais das abas, cabeçalhos e linha de cabeçalho.
 - Compatibilidade e perfil definitivo para solicitações não letivas.
 - Regra e formato estruturado para várias aulas em um registro.

@@ -1,6 +1,7 @@
 {
   "input_directory": "",
   "output_directory": "",
+  "dw_export_file_name": "base_dw.xlsx",
   "source_folders": [
     {"name": "1. LETIVA", "request_type": "letiva", "enabled": true},
     {"name": "3. LETIVA - Anterior_Maio.25", "request_type": "letiva", "enabled": true},
@@ -36,15 +37,5 @@
         "fim": {"column": "T", "aliases": []}
       }
     }
-  ],
-  "sql": {
-    "server": "",
-    "database": "sqldb-coe-pucpr-dw",
-    "authentication": "windows",
-    "odbc_driver": "ODBC Driver 18 for SQL Server",
-    "encrypt": true,
-    "trust_server_certificate": false,
-    "connect_timeout_seconds": 15,
-    "query_timeout_seconds": 90
-  }
+  ]
 }

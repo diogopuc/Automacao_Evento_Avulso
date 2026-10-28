@@ -1,0 +1,97 @@
+Sub verificarConflitosDeHorarios()
+
+    Application.ScreenUpdating = False
+
+    Dim wbLetivas As Workbook
+    Dim wsAgenda As Worksheet, xsLetivas As Worksheet
+    Dim rngAgenda As Range, rngLetivas As Range
+    Dim cell As Range, matchCell As Range
+    Dim matricula As String, dataAula As Date
+    Dim horaInicio As Date, horaFim As Date
+    Dim tipoAtividade As String
+    Dim dataLetivas As Date, horaInicioLetivas As Date, horaFimLetivas As Date
+    Dim conflito As String
+    Dim linhaLetiva As Long
+
+    ' Definir o arquivo atual
+    Set wbLetivas = ThisWorkbook
+
+    ' Definir as planilhas
+    Set wsAgenda = wbLetivas.Sheets("agenda")
+    Set xsLetivas = wbLetivas.Sheets("letivas")
+
+    ' Definir os intervalos
+    Set rngAgenda = wsAgenda.Range("A2", wsAgenda.Cells(wsAgenda.Rows.Count, "A").End(xlUp))
+    Set rngLetivas = xsLetivas.Range("AB2", xsLetivas.Cells(xsLetivas.Rows.Count, "AB").End(xlUp))
+
+    ' Percorrer a aba "agenda"
+    For Each cell In rngAgenda
+
+        matricula = Trim(cell.Value)
+
+        If Not IsEmpty(cell.Offset(0, 20).Value) Then
+            dataAula = cell.Offset(0, 20).Value ' Coluna U
+        Else
+            GoTo NextIteration
+        End If
+
+        If Not IsEmpty(cell.Offset(0, 22).Value) Then
+            horaInicio = cell.Offset(0, 22).Value ' Coluna W
+        Else
+            GoTo NextIteration
+        End If
+
+        If Not IsEmpty(cell.Offset(0, 23).Value) Then
+            horaFim = cell.Offset(0, 23).Value ' Coluna X
+        Else
+            GoTo NextIteration
+        End If
+
+        ' Obter o tipo de atividade
+        tipoAtividade = cell.Offset(0, 29).Value ' Coluna AD
+
+        ' Percorrer a aba "letivas" para buscar sobreposição
+        For Each matchCell In rngLetivas
+
+            If Trim(matchCell.Value) = matricula Then
+
+                dataLetivas = matchCell.Offset(0, -11).Value ' Coluna Q
+
+                If dataLetivas = dataAula Then
+
+                    horaInicioLetivas = matchCell.Offset(0, -9).Value ' Coluna S
+                    horaFimLetivas = matchCell.Offset(0, -8).Value    ' Coluna T
+
+                    If horaInicio < horaFimLetivas And horaFim > horaInicioLetivas Then
+
+                        ' Criar a mensagem de conflito
+                        conflito = "Conflito de atividade da graduação " & _
+                                   Format(dataAula, "dd/mm/yyyy") & " " & _
+                                   Format(horaInicio, "hh:mm") & " às " & _
+                                   Format(horaFim, "hh:mm") & _
+                                   " com a atividade da pós " & _
+                                   Format(dataLetivas, "dd/mm/yyyy") & " " & _
+                                   Format(horaInicioLetivas, "hh:mm") & " às " & _
+                                   Format(horaFimLetivas, "hh:mm")
+
+                        ' Obter a linha correspondente
+                        linhaLetiva = matchCell.Row
+
+                        ' Registrar o conflito nas colunas AE e AF
+                        xsLetivas.Cells(linhaLetiva, 31).Value = tipoAtividade ' Coluna AE
+                        xsLetivas.Cells(linhaLetiva, 32).Value = conflito      ' Coluna AF
+
+                    End If
+                End If
+            End If
+
+        Next matchCell
+
+NextIteration:
+    Next cell
+
+    Application.ScreenUpdating = True
+
+    MsgBox "Conflitos registrados diretamente na aba Letivas (colunas AE e AF).", vbInformation
+
+End Sub

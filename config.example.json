@@ -1,0 +1,50 @@
+{
+  "input_directory": "",
+  "output_directory": "",
+  "source_folders": [
+    {"name": "1. LETIVA", "request_type": "letiva", "enabled": true},
+    {"name": "3. LETIVA - Anterior_Maio.25", "request_type": "letiva", "enabled": true},
+    {"name": "2. NAO LETIVA", "request_type": "nao_letiva", "enabled": true},
+    {"name": "3.1 NAO LETIVA - Anterior_Maio.25", "request_type": "nao_letiva", "enabled": true}
+  ],
+  "profiles": [
+    {
+      "id": "novo_evento_avulso",
+      "name": "Novo template - Evento Avulso",
+      "sheet_names": [],
+      "header_row": 1,
+      "first_data_row": 2,
+      "request_types": ["letiva", "nao_letiva"],
+      "fields": {
+        "matricula": {"column": "B", "aliases": ["matrícula", "matricula", "matrícula do docente"]},
+        "data": {"column": "F", "aliases": ["data de início da realização da atividade", "data inicio realização", "data"]},
+        "inicio": {"column": "W", "aliases": ["horário de início", "horario de inicio", "hora início"]},
+        "fim": {"column": "X", "aliases": ["horário de término", "horario de termino", "hora término"]}
+      }
+    },
+    {
+      "id": "legado_vba",
+      "name": "Legado VBA (seleção explícita)",
+      "sheet_names": [],
+      "header_row": 1,
+      "first_data_row": 2,
+      "request_types": ["letiva", "nao_letiva"],
+      "fields": {
+        "matricula": {"column": "AB", "aliases": []},
+        "data": {"column": "Q", "aliases": []},
+        "inicio": {"column": "S", "aliases": []},
+        "fim": {"column": "T", "aliases": []}
+      }
+    }
+  ],
+  "sql": {
+    "server": "",
+    "database": "sqldb-coe-pucpr-dw",
+    "authentication": "windows",
+    "odbc_driver": "ODBC Driver 18 for SQL Server",
+    "encrypt": true,
+    "trust_server_certificate": false,
+    "connect_timeout_seconds": 15,
+    "query_timeout_seconds": 90
+  }
+}

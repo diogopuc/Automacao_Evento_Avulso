@@ -1,0 +1,1 @@
+"""Automação de Eventos Avulsos."""

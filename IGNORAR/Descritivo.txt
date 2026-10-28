@@ -1,0 +1,90 @@
+ESPECIFICACAO FUNCIONAL - VERIFICACAO DE CONFLITOS DE HORARIOS
+Conversao da macro VBA verificarConflitosDeHorarios() para Python
+
+1. OBJETIVO
+
+Comparar as atividades da aba "agenda" com as da aba "letivas", dentro do mesmo arquivo Excel, para identificar quando um mesmo docente tem atividades com horarios sobrepostos na mesma data. Os conflitos encontrados devem ser registrados na aba "letivas".
+
+2. COLUNAS UTILIZADAS
+
+ABA "agenda" - ENTRADAS (somente leitura)
+  A  - Matricula do docente (identificador para cruzamento)
+  U  - Data da atividade
+  W  - Hora de inicio
+  X  - Hora de termino
+  AD - Tipo de atividade (copiado para o resultado, se houver conflito)
+
+ABA "letivas" - ENTRADAS (somente leitura)
+  AB - Matricula do docente (identificador para cruzamento)
+  Q  - Data da atividade
+  S  - Hora de inicio
+  T  - Hora de termino
+
+ABA "letivas" - SAIDAS (gravacao)
+  AE - Tipo de atividade: recebe o valor de "agenda"!AD
+  AF - Descricao textual do conflito de horarios
+
+Total: 9 colunas de entrada (5 da agenda e 4 da letivas) e 2 de saida (ambas da letivas). Nenhuma celula da aba "agenda" e alterada.
+
+3. REGRAS DE COMPARACAO
+
+Para cada linha da aba "agenda", a partir da linha 2:
+
+  a) Ler a matricula em A e os dados de data/horario em U, W e X.
+  b) Se U, W ou X estiver vazia, pular essa linha da agenda.
+  c) Procurar linhas da aba "letivas" (tambem a partir da linha 2) em que:
+     - "agenda"!A = "letivas"!AB, retirando espacos no inicio e no fim da matricula;
+     - "agenda"!U = "letivas"!Q (mesma data);
+     - "agenda"!W < "letivas"!T (inicio da agenda antes do fim da letiva);
+     - "agenda"!X > "letivas"!S (fim da agenda depois do inicio da letiva).
+
+  d) As quatro condicoes acima devem ser verdadeiras para haver conflito.
+     Os horarios podem se sobrepor apenas parcialmente. Se uma atividade
+     termina exatamente quando a outra comeca, NAO ha conflito.
+
+4. RESULTADO PARA CADA CONFLITO
+
+Na mesma linha correspondente da aba "letivas":
+  AE = valor da coluna AD da linha em "agenda" que gerou o conflito;
+  AF = texto no seguinte formato:
+
+  Conflito de atividade da graduação DD/MM/AAAA HH:MM às HH:MM com a atividade da pós DD/MM/AAAA HH:MM às HH:MM
+
+O primeiro conjunto de data/horarios vem de "agenda" (U, W, X).
+O segundo conjunto vem de "letivas" (Q, S, T).
+
+5. COMPORTAMENTO ATUAL QUE DEVE SER CONSIDERADO NA MIGRACAO
+
+  - A busca percorre todas as linhas da agenda e, para cada uma delas,
+    todas as linhas da letivas. Portanto, uma atividade pode ter mais de
+    um conflito potencial.
+  - Se varias linhas da agenda conflitarem com a mesma linha da letivas,
+    AE e AF sao sobrescritas. Ao final, permanece apenas o ultimo conflito
+    encontrado para aquela linha da letivas.
+  - A macro NAO limpa AE e AF antes de executar. Assim, resultados antigos
+    podem permanecer quando um conflito deixa de existir. Avaliar se a versao
+    em Python deve preservar esse comportamento ou limpar previamente as
+    duas colunas (essa mudanca exige decisao de negocio).
+  - No VBA, o intervalo da agenda vai da linha 2 ate a ultima linha
+    preenchida em A; o da letivas, da linha 2 ate a ultima linha
+    preenchida em AB.
+  - A macro valida o preenchimento da data e dos horarios da agenda, mas
+    nao faz a mesma validacao explicita na aba letivas. Recomenda-se tratar
+    valores vazios e formatos invalidos na conversao para Python.
+  - As matriculas devem ser comparadas como identificadores, sem perder
+    possiveis zeros a esquerda; as datas e horas devem ser interpretadas
+    como valores temporais do Excel, nao como simples textos.
+  - A marcacao "Coluna V" em um comentario da macro original estava
+    errada: Offset(0, 20) a partir de A aponta para U. O processamento
+    aqui documentado usa U, conforme a versao revisada.
+
+6. RESUMO EXECUTIVO PARA IMPLEMENTACAO
+
+Chave de busca: matricula (agenda!A versus letivas!AB) + data
+               (agenda!U versus letivas!Q).
+Teste de conflito: agenda!W < letivas!T E agenda!X > letivas!S.
+Coluna de origem do tipo de atividade: agenda!AD.
+Unicas colunas escritas: letivas!AE e letivas!AF.
+
+Esta especificacao descreve a logica da versao revisada do VBA.
+Nao implica alteracao do arquivo Excel nem define uma nova regra de negocio.

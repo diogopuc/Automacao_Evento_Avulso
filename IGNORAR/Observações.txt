@@ -1,0 +1,32 @@
+vai precisar consolidar 
+
+1 - fazer consolidação: 2 pastas para as letivas e mais 2 pastas para não letivas em duas abas diferentes uma pra cada (aba 1 e 2 ex)
+
+apontar para a base "01.A processar", ignorar as pastas que estão com "ajustes" no nome
+
+copiar todo o conteúdo  das solicitações evento avulso (pre programar o cabeçalho) incrementar em uma planilha todas as solcitacoes
+
+no template que vou consolidar vai chegar duas colunas a mais com horário inicio e horário fim da atividade (col W e X)
+
+verificar se o docente tem conflito de horário com as aulas da graduação no agenda (atv do docente) se tiver conflito, colocar um aviso na planilha e se não tiver também (colocar na coluna Z a descrição). colocar também o tipo da atividade que esta dando conflito (letiva ou não letiva, col Y)
+
+start manual
+
+se atentar ao formato das atividades
+
+
+rever e identificar essas colunas antigas nos arquivos que estao chegando por template:
+
+ABA "letivas" - ENTRADAS (somente leitura) 
+  AB - Matricula do docente (identificador para cruzamento) | ex: esta na coluna B
+  Q  - Data da atividade | ex: passou a ser a coluna F no template, vai ser sempre a data de inicio relização
+  S  - Hora de inicio | as duas novas colunas que vão chegar
+  T  - Hora de termino | as duas novas colunas que vão chegar
+
+ver com a mari se cada aula vai vir em uma linha por causa do horario ou se vai manter em uma so como ja esta.
+
+pedir para IA dar uma validada na logica do VBA para ver se esta de acordo, melhorias e etc.
+
+mostrar conflito neste caso de EX:
+Aula Agenda começa as 08h00, mas termina as 08h45
+Se o EV Avulso começar as 08h00 ele nao da conflito inicial, mas da conflito com o final da aula do agenda. neste caso, indicar o conflito.

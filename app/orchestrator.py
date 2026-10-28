@@ -77,8 +77,7 @@ class Processor:
                 self.logger.info("Cancelamento confirmado durante a leitura do arquivo da view.")
                 raise
             except Exception as exc:
-                # Do not log the driver exception: it can contain connection details.
-                activities, failed = [], "falha na consulta/carregamento do DW"; summary.status = "Concluído com pendências"; issues.append(["DW", source_label, failed]); self.logger.error("Falha no DW; detalhes de conexão foram omitidos do log.")
+                activities, failed = [], f"falha ao carregar o arquivo da view: {exc}"; summary.status = "Concluído com pendências"; issues.append(["Arquivo da view", source_label, failed]); self.logger.exception("Falha ao carregar o arquivo da view")
         self._stage("Verificando conflitos", 75); token.raise_if_cancelled(); details = check_conflicts(records, activities, coverage, failed)
         summary.conflicts = sum(r.result_message.startswith("Conflito") for r in records); summary.no_conflicts = sum(r.result_message == "Sem conflito." for r in records); summary.not_verified = len(records) - summary.conflicts - summary.no_conflicts; summary.conflict_occurrences = len(details)
         if issues or summary.not_verified: summary.status = "Concluído com pendências"

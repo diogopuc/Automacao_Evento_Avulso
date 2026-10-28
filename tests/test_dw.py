@@ -12,7 +12,7 @@ def test_dw_export_is_streamed_and_validated(tmp_path):
     sheet.append(["MATRICULA_ADP", "DATA", "HORARIO_INICIO HR Relogio", "HORARIO_FIM HR Relogio", "TIPO_ATIVIDADE", "DISCIPLINA_ATIVIDADE_NOME"])
     sheet.append(["000123", date(2026,10,28), time(8), time(8,45), "Letiva", "Disciplina"])
     workbook.save(file)
-    assert inspect_dw_export(file) == ("View", 1)
+    assert inspect_dw_export(file) == ("Planilha 1", 1)
     progress = []
     records = load_dw_export(file, CancellationToken(), lambda done, total: progress.append((done, total)))
     assert records[0].matricula == "000123" and not records[0].issues

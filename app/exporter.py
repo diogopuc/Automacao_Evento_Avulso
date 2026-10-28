@@ -16,20 +16,17 @@ from .normalize import safe_text
 HEADER = PatternFill("solid", fgColor="1F4E78"); WHITE = Font(color="FFFFFF", bold=True)
 GREEN = PatternFill("solid", fgColor="E2F0D9"); RED = PatternFill("solid", fgColor="FCE4D6"); YELLOW = PatternFill("solid", fgColor="FFF2CC")
 RESULT_TYPE = "Tipo da atividade em conflito"; RESULT_MESSAGE = "Resultado da verificação"
-TRACE_HEADERS = ["Arquivo de origem", "Caminho relativo", "Aba de origem", "Linha de origem", "Pasta de origem", "Perfil utilizado", "Identificador do registro", "Identificador da execução"]
-
-
 def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -> None:
     ws = workbook.create_sheet(title)
     data_headers = []
     for record in records:
         for header in record.values:
             if header not in data_headers: data_headers.append(header)
-    headers = data_headers + [RESULT_TYPE, RESULT_MESSAGE] + TRACE_HEADERS
+    headers = data_headers + [RESULT_TYPE, RESULT_MESSAGE]
     ws.append(headers)
     for cell in ws[1]: cell.fill = HEADER; cell.font = WHITE
     for record in records:
-        row = [safe_text(record.values.get(h, "")) for h in data_headers] + [record.result_type, record.result_message, record.source_file, record.relative_path, record.source_sheet, record.source_row, record.source_folder, record.profile_id, record.record_id, record.execution_id]
+        row = [safe_text(record.values.get(h, "")) for h in data_headers] + [record.result_type, record.result_message]
         ws.append(row)
     ws.freeze_panes = "A2"; ws.auto_filter.ref = ws.dimensions
     for row in range(2, ws.max_row + 1):

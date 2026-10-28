@@ -13,4 +13,4 @@ def test_export_reconciles_summary_and_keeps_traceability(tmp_path):
     assert wb.sheetnames[:3] == ["Resumo", "Letivas", "Não Letivas"]
     ws = wb["Letivas"]
     headers = [cell.value for cell in ws[1]]
-    assert ws.max_row == 2 and "Identificador do registro" in headers and ws.cell(2, headers.index("Matrícula") + 1).value == "000123"
+    assert ws.max_row == 2 and "Identificador do registro" not in headers and ws.cell(2, headers.index("Matrícula") + 1).value == "000123"

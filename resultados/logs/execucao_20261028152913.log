@@ -1,0 +1,15 @@
+2026-10-28 15:29:13,299 | INFO | Validando configurações
+2026-10-28 15:29:13,300 | INFO | Localizando arquivos
+2026-10-28 15:29:13,301 | INFO | Lendo solicitações — Solicitacao_Evento_Avulso_Letiva.2026-10-27_14.04.xlsx
+2026-10-28 15:29:13,310 | INFO | Lendo solicitações — Solicitacao_Evento_Avulso_Letiva.2026-10-20_10.12.xlsx
+2026-10-28 15:29:13,322 | INFO | Lendo solicitações — Solicitacao_Evento_Avulso_Nao_Letiva.2026-10-27_11.31.xlsx
+2026-10-28 15:29:13,345 | INFO | Lendo solicitações — Solicitacao_Evento_Avulso_Nao_Letiva.2026-10-27_11.50.xlsx
+2026-10-28 15:29:13,352 | INFO | Lendo solicitações — Solicitacao_Evento_Avulso_Nao_Letiva.2026-10-27_14.52.xlsx
+2026-10-28 15:29:13,359 | INFO | Lendo solicitações — Solicitacao_Evento_Avulso_Nao_Letiva.2026-10-28_09.06.xlsx
+2026-10-28 15:29:13,366 | INFO | Lendo solicitações — Solicitacao_Evento_Avulso_Nao_Letiva.2026-07-29_09.38.xlsx
+2026-10-28 15:29:13,376 | INFO | Carregando arquivo exportado da view — base_dw.xlsx
+2026-10-28 15:29:56,021 | ERROR | Falha no DW; detalhes de conexão foram omitidos do log.
+2026-10-28 15:29:56,021 | INFO | Verificando conflitos
+2026-10-28 15:29:56,021 | INFO | Gerando relatório
+2026-10-28 15:29:56,175 | INFO | Finalizando — consolidado_eventos_avulsos_20261028_152956_26578f7e.xlsx
+2026-10-28 15:29:56,175 | INFO | Relatório gerado: C:\Users\diogo.jooliveira\Grupo Marista\Diretório Controle Acadêmico - Documentos\10_Analistas\10.10_Diogo\17 - Evento Avulso Automação\resultados\consolidado_eventos_avulsos_20261028_152956_26578f7e.xlsx

@@ -6,6 +6,16 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.7.0 - 2026-11-11
+
+### Adicionado
+
+- Criadas as colunas `Validação intrajornada` e `Validação interjornada` na aba `Letivas`.
+- Implementada a validação intrajornada: pausa mínima de 15 minutos para jornadas de 5h a menos de 7h e de 1h para jornadas de 7h até 8h.
+- Jornadas superiores a 8h passam a ser marcadas como não conformes.
+- Implementada a validação interjornada de 11h entre a última atividade de um dia e a primeira atividade do dia seguinte.
+- A leitura da `base_dw.xlsx` agora inclui o dia anterior e o seguinte de cada solicitação para calcular a interjornada.
+
 ## v1.6.0 - 2026-11-11
 
 ### Alterado

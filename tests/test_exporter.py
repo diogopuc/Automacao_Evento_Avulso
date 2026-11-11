@@ -14,6 +14,7 @@ def test_export_includes_conflict_result_without_duplicate_filters(tmp_path):
     workbook = load_workbook(output, data_only=True)
     headers = [cell.value for cell in workbook["Letivas"][1]]
     assert "Resultado da verificação" in headers
+    assert "Validação intrajornada" in headers and "Validação interjornada" in headers
     assert workbook["Letivas"].cell(2, headers.index("Resultado da verificação") + 1).value == "Sem conflito."
     with ZipFile(output) as archive:
         worksheet_xml = archive.read("xl/worksheets/sheet2.xml").decode("utf-8")

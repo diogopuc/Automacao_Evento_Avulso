@@ -40,6 +40,8 @@ class RequestRecord:
     issues: list[str] = field(default_factory=list)
     result_type: str = ""
     result_message: str = ""
+    intrajornada_message: str = ""
+    interjornada_message: str = ""
     conflict_count: int = 0
 
 

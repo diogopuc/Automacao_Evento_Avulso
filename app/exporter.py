@@ -19,6 +19,8 @@ RED = PatternFill("solid", fgColor="FCE4D6")
 YELLOW = PatternFill("solid", fgColor="FFF2CC")
 RESULT_TYPE = "Tipo da atividade em conflito"
 RESULT_MESSAGE = "Resultado da verificação"
+INTRAJORNADA = "Validação intrajornada"
+INTERJORNADA = "Validação interjornada"
 
 
 def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -> None:
@@ -28,21 +30,19 @@ def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -
         for header in record.values:
             if header not in data_headers:
                 data_headers.append(header)
-    headers = data_headers + [RESULT_TYPE, RESULT_MESSAGE]
+    headers = data_headers + [RESULT_TYPE, RESULT_MESSAGE, INTRAJORNADA, INTERJORNADA]
     ws.append(headers)
     for cell in ws[1]:
         cell.fill = HEADER
         cell.font = WHITE
     for record in records:
-        ws.append([safe_text(record.values.get(header, "")) for header in data_headers] + [record.result_type, record.result_message])
+        ws.append([safe_text(record.values.get(header, "")) for header in data_headers] + [record.result_type, record.result_message, record.intrajornada_message, record.interjornada_message])
     ws.freeze_panes = "A2"
     for row in range(2, ws.max_row + 1):
-        result_type_cell = ws.cell(row, headers.index(RESULT_TYPE) + 1)
-        result_message_cell = ws.cell(row, headers.index(RESULT_MESSAGE) + 1)
-        result_type_cell.alignment = Alignment(wrap_text=True, vertical="top")
-        result_message_cell.alignment = Alignment(wrap_text=True, vertical="top")
-        text = str(result_message_cell.value or "")
-        fill = RED if text.startswith("Conflito") else GREEN if text.startswith("Sem conflito") else YELLOW
+        for header in (RESULT_TYPE, RESULT_MESSAGE, INTRAJORNADA, INTERJORNADA):
+            ws.cell(row, headers.index(header) + 1).alignment = Alignment(wrap_text=True, vertical="top")
+        messages = [str(ws.cell(row, headers.index(header) + 1).value or "") for header in (RESULT_MESSAGE, INTRAJORNADA, INTERJORNADA)]
+        fill = RED if any(message.startswith(("Conflito", "Não conforme")) for message in messages) else GREEN if all(message.startswith("Conforme") or message == "Sem conflito." for message in messages) else YELLOW
         for cell in ws[row]:
             cell.fill = fill
     for index, header in enumerate(headers, 1):

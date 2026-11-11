@@ -22,6 +22,15 @@ Consulte [CHANGELOG.md](CHANGELOG.md) para o histórico de versões e alteraçõ
 
 A aba **Letivas** traz o resultado por registro: `Conflito`, `Sem conflito` ou `Não verificado`. Os detalhes de cada conflito ficam na aba **Detalhamento de conflitos** quando houver ocorrências.
 
+## Descansos entre jornadas
+
+Além dos conflitos com a base, o relatório calcula duas validações para cada solicitação válida, usando os horários da base e dos Eventos Avulsos do mesmo professor:
+
+- **Intrajornada:** jornada de 5h a menos de 7h requer pausa mínima de 15 minutos; jornada de 7h até 8h requer pausa mínima de 1h; jornada acima de 8h é marcada como não conforme.
+- **Interjornada:** são exigidas 11h entre o término da última atividade de um dia e o início da primeira atividade do dia seguinte.
+
+Os resultados ficam nas colunas **Validação intrajornada** e **Validação interjornada** da aba **Letivas**.
+
 ## Demonstração e testes
 
 Execute `python exemplos/gerar_dados_ficticios.py` e escolha `exemplos/dados_ficticios` como entrada. Execute os testes com `pytest`.

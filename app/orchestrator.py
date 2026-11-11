@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
@@ -12,6 +12,7 @@ from .exporter import export_report
 from .models import CancelledError, CancellationToken, Coverage, RunSummary
 from .profiles import Profile
 from .reader import read_requests
+from .rest_rules import check_rest_rules
 
 
 class Processor:
@@ -82,7 +83,12 @@ class Processor:
         activities = []
         failed: str | None = None
         try:
-            wanted_keys = {(record.matricula, record.activity_date) for record in records if not record.issues}
+            wanted_keys = {
+                (record.matricula, day)
+                for record in records
+                if not record.issues
+                for day in (record.activity_date - timedelta(days=1), record.activity_date, record.activity_date + timedelta(days=1))
+            }
             if not wanted_keys:
                 self._stage("Arquivo da view não será carregado", 70, "não há Evento Avulso válido para comparar")
             else:
@@ -109,6 +115,8 @@ class Processor:
         self._stage("Verificando conflitos", 75)
         token.raise_if_cancelled()
         details = check_conflicts(records, activities, coverage, failed)
+        self._stage("Validando intrajornada e interjornada", 82)
+        check_rest_rules(records, activities, coverage, failed)
         summary.conflicts = sum(record.result_message.startswith("Conflito") for record in records)
         summary.no_conflicts = sum(record.result_message == "Sem conflito." for record in records)
         summary.not_verified = len(records) - summary.conflicts - summary.no_conflicts

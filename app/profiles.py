@@ -6,7 +6,6 @@ from .models import Profile
 from .normalize import normalized_header
 
 REQUIRED = ("matricula", "data")
-OPTIONAL_SCHEDULE_FIELDS = ("inicio", "fim")
 
 
 def resolve_profile_sheet(workbook, profile: Profile) -> tuple[object, dict[str, int]]:
@@ -32,16 +31,6 @@ def resolve_profile_sheet(workbook, profile: Profile) -> tuple[object, dict[str,
             else:
                 valid = False; break
         if valid:
-            for field in OPTIONAL_SCHEDULE_FIELDS:
-                spec = profile.fields.get(field, {})
-                aliases = [normalized_header(alias) for alias in spec.get("aliases", [])]
-                alias_cols = {headers[alias] for alias in aliases if alias in headers}
-                if len(alias_cols) == 1:
-                    resolved[field] = alias_cols.pop()
-                elif spec.get("column"):
-                    column = column_index_from_string(spec["column"])
-                    if column <= sheet.max_column:
-                        resolved[field] = column
             matches.append((sheet, resolved))
     if not matches:
         raise ValueError(f"Perfil '{profile.name}' não reconheceu nenhuma aba do arquivo.")

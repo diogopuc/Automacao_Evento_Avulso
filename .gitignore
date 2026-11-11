@@ -1,4 +1,7 @@
 
 /base_dw.xlsx
+__pycache__/
+*.pyc
+resultados/
 
 /base_dw.xlsx

@@ -2,6 +2,8 @@
 
 Aplicação desktop para consolidar solicitações de Eventos Avulsos e verificar conflitos de horário com a base local `base_dw.xlsx`, exportada da view. Não existe conexão com SQL Server, credenciais ou consultas de banco de dados.
 
+Consulte [CHANGELOG.md](CHANGELOG.md) para o histórico de versões e alterações funcionais.
+
 ## Instalação no Windows
 
 1. Instale Python 3.11+ e marque **Add Python to PATH**.

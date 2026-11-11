@@ -11,8 +11,10 @@ from tkinter import filedialog, messagebox, ttk
 
 from .config import application_root, load_config, profiles, save_config
 from .discovery import discover_excel_files
+from .dw import inspect_dw_export
 from .logging_config import configure_logging
-from .models import CancellationToken
+from .models import CancellationToken, Coverage
+from .normalize import parse_date
 from .orchestrator import Processor
 from .reader import preview_mapping
 
@@ -28,17 +30,19 @@ class Application(ttk.Frame):
         self.running = False
         self.run_started_at: float | None = None
         root = application_root()
-        default_input = self.config_data.get("input_directory") or str(root)
-        default_output = self.config_data.get("output_directory") or str(root / "resultados")
-        self.input_var = tk.StringVar(value=default_input)
-        self.output_var = tk.StringVar(value=default_output)
+        self.input_var = tk.StringVar(value=self.config_data.get("input_directory") or str(root))
+        self.output_var = tk.StringVar(value=self.config_data.get("output_directory") or str(root / "resultados"))
+        default_base = root / "base_dw.xlsx"
+        self.dw_file_var = tk.StringVar(value=str(default_base) if default_base.is_file() else "")
         self.profile_var = tk.StringVar()
+        self.coverage_start = tk.StringVar()
+        self.coverage_end = tk.StringVar()
         self._build()
         self.after(120, self._poll)
 
     def _build(self) -> None:
-        self.master.title("Eventos Avulsos - Consolidação")
-        self.master.minsize(850, 560)
+        self.master.title("Eventos Avulsos - Consolidação e Conflitos")
+        self.master.minsize(850, 620)
 
         def folder_row(label: str, variable: tk.StringVar) -> None:
             frame = ttk.Frame(self)
@@ -49,18 +53,34 @@ class Application(ttk.Frame):
 
         folder_row("Diretório de entrada", self.input_var)
         folder_row("Diretório de saída", self.output_var)
-        frame = ttk.Frame(self)
-        frame.pack(fill="x", pady=5)
-        ttk.Label(frame, text="Perfil de template", width=22).pack(side="left")
-        self.profiles_box = ttk.Combobox(frame, textvariable=self.profile_var, state="readonly", values=[profile.id for profile in profiles(self.config_data)])
+        profile_frame = ttk.Frame(self)
+        profile_frame.pack(fill="x", pady=5)
+        ttk.Label(profile_frame, text="Perfil de template", width=22).pack(side="left")
+        self.profiles_box = ttk.Combobox(profile_frame, textvariable=self.profile_var, state="readonly", values=[profile.id for profile in profiles(self.config_data)])
         self.profiles_box.pack(side="left", fill="x", expand=True)
         self.profiles_box.current(0)
+
+        base_frame = ttk.Frame(self)
+        base_frame.pack(fill="x", pady=3)
+        ttk.Label(base_frame, text="Arquivo base da view", width=22).pack(side="left")
+        ttk.Entry(base_frame, textvariable=self.dw_file_var).pack(side="left", fill="x", expand=True)
+        ttk.Button(base_frame, text="Selecionar arquivo", command=lambda: self.dw_file_var.set(filedialog.askopenfilename(filetypes=[("Excel", "*.xlsx *.xlsm")]) or self.dw_file_var.get())).pack(side="left", padx=(6, 0))
+
+        coverage_frame = ttk.Frame(self)
+        coverage_frame.pack(fill="x", pady=3)
+        ttk.Label(coverage_frame, text="Cobertura da base (opcional)", width=22).pack(side="left")
+        ttk.Entry(coverage_frame, textvariable=self.coverage_start, width=13).pack(side="left")
+        ttk.Label(coverage_frame, text="até").pack(side="left", padx=4)
+        ttk.Entry(coverage_frame, textvariable=self.coverage_end, width=13).pack(side="left")
+        ttk.Label(coverage_frame, text="DD/MM/AAAA").pack(side="left", padx=6)
 
         actions = ttk.Frame(self)
         actions.pack(fill="x", pady=7)
         self.validate_btn = ttk.Button(actions, text="Validar arquivos", command=self.validate)
         self.validate_btn.pack(side="left")
         ttk.Button(actions, text="Prévia do mapeamento", command=self.preview).pack(side="left", padx=5)
+        self.validate_base_btn = ttk.Button(actions, text="Validar base", command=self.validate_dw_file)
+        self.validate_base_btn.pack(side="left", padx=5)
         self.run_btn = ttk.Button(actions, text="Executar", command=self.run)
         self.run_btn.pack(side="left")
         self.cancel_btn = ttk.Button(actions, text="Cancelar", command=self.cancel, state="disabled")
@@ -82,6 +102,12 @@ class Application(ttk.Frame):
 
     def _profile(self):
         return next(profile for profile in profiles(self.config_data) if profile.id == self.profile_var.get())
+
+    def _coverage(self) -> Coverage:
+        start, end = parse_date(self.coverage_start.get()), parse_date(self.coverage_end.get())
+        if bool(start) != bool(end):
+            raise ValueError("Informe as duas datas da cobertura ou deixe ambas em branco.")
+        return Coverage(bool(start and end), start, end)
 
     def _append(self, text: str) -> None:
         self.log.configure(state="normal")
@@ -134,6 +160,15 @@ class Application(ttk.Frame):
         except Exception as exc:
             messagebox.showerror("Prévia", str(exc))
 
+    def validate_dw_file(self) -> None:
+        try:
+            path = Path(self.dw_file_var.get())
+            sheet, total = inspect_dw_export(path)
+            rows = f"{total:,}" if total else "não informado pelo arquivo"
+            messagebox.showinfo("Base da view", f"Estrutura validada. Aba: {sheet}. Linhas de dados: {rows}.")
+        except Exception as exc:
+            messagebox.showerror("Base da view", f"Não foi possível validar o arquivo: {exc}")
+
     def open_output(self) -> None:
         os.startfile(self.output_var.get())
 
@@ -145,10 +180,15 @@ class Application(ttk.Frame):
         if self.token:
             self.token.cancel()
             self.cancel_btn.configure(state="disabled")
-            self.stage.set("Cancelamento solicitado. Aguardando o fim do arquivo atual.")
+            self.stage.set("Cancelamento solicitado. Aguardando o fim do lote atual.")
             self._append("Cancelamento solicitado pelo usuário.")
 
     def run(self) -> None:
+        try:
+            coverage = self._coverage()
+        except ValueError as exc:
+            messagebox.showerror("Cobertura da base", str(exc))
+            return
         self.token = CancellationToken()
         self.running = True
         self.run_started_at = time.monotonic()
@@ -166,9 +206,9 @@ class Application(ttk.Frame):
             logger = configure_logging(Path(self.output_var.get()) / "logs", execution_id, lambda message: self.events.put(("log", message)))
             try:
                 processor = Processor(self.config_data, logger, lambda stage, percentage, current: self.events.put(("progress", (stage, percentage, current))))
-                result = processor.run(Path(self.input_var.get()), Path(self.output_var.get()), self._profile(), self.token)
+                result = processor.run(Path(self.input_var.get()), Path(self.output_var.get()), self._profile(), Path(self.dw_file_var.get()), coverage, self.token)
                 summary = processor.last_summary
-                message = f"{summary.status}. Letivas: {summary.letivas}; não letivas: {summary.nao_letivas}. Relatório: {result.name}"
+                message = f"{summary.status}. Letivas: {summary.letivas}; não letivas: {summary.nao_letivas}; conflitos: {summary.conflicts}; sem conflito: {summary.no_conflicts}; não verificados: {summary.not_verified}. Relatório: {result.name}"
                 self.events.put(("done", (result, message)))
             except Exception as exc:
                 message = "Execução cancelada." if self.token and self.token.is_cancelled else str(exc)

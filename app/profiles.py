@@ -6,6 +6,7 @@ from .models import Profile
 from .normalize import normalized_header
 
 REQUIRED = ("matricula", "data")
+OPTIONAL_SCHEDULE_FIELDS = ("inicio", "fim")
 
 
 def resolve_profile_sheet(workbook, profile: Profile) -> tuple[object, dict[str, int]]:
@@ -14,23 +15,36 @@ def resolve_profile_sheet(workbook, profile: Profile) -> tuple[object, dict[str,
     for sheet in candidates:
         header_cells = next(sheet.iter_rows(min_row=profile.header_row, max_row=profile.header_row), ())
         headers = {normalized_header(cell.value): cell.column for cell in header_cells if cell.value is not None}
-        resolved = {}
+        resolved: dict[str, int] = {}
         valid = True
         for field in REQUIRED:
             spec = profile.fields.get(field, {})
-            aliases = [normalized_header(a) for a in spec.get("aliases", [])]
-            alias_cols = {headers[a] for a in aliases if a in headers}
-            if len(alias_cols) > 1:
-                valid = False; break
-            if alias_cols:
-                resolved[field] = alias_cols.pop()
+            aliases = [normalized_header(alias) for alias in spec.get("aliases", [])]
+            alias_columns = {headers[alias] for alias in aliases if alias in headers}
+            if len(alias_columns) > 1:
+                valid = False
+                break
+            if alias_columns:
+                resolved[field] = alias_columns.pop()
             elif spec.get("column"):
                 resolved[field] = column_index_from_string(spec["column"])
                 if resolved[field] > sheet.max_column:
-                    valid = False; break
+                    valid = False
+                    break
             else:
-                valid = False; break
+                valid = False
+                break
         if valid:
+            for field in OPTIONAL_SCHEDULE_FIELDS:
+                spec = profile.fields.get(field, {})
+                aliases = [normalized_header(alias) for alias in spec.get("aliases", [])]
+                alias_columns = {headers[alias] for alias in aliases if alias in headers}
+                if len(alias_columns) == 1:
+                    resolved[field] = alias_columns.pop()
+                elif spec.get("column"):
+                    column = column_index_from_string(spec["column"])
+                    if column <= sheet.max_column:
+                        resolved[field] = column
             matches.append((sheet, resolved))
     if not matches:
         raise ValueError(f"Perfil '{profile.name}' não reconheceu nenhuma aba do arquivo.")

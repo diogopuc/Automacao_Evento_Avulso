@@ -1,29 +1,25 @@
 # Eventos Avulsos
 
-Aplicação desktop em português para consolidar solicitações de Eventos Avulsos. Ela lê apenas arquivos `xlsx` e `xlsm` diretamente nas pastas configuradas, não percorre subpastas e nunca move, renomeia, exclui ou altera os arquivos de origem.
+Aplicação desktop para consolidar solicitações de Eventos Avulsos e verificar conflitos de horário com a base local `base_dw.xlsx`, exportada da view. Não existe conexão com SQL Server, credenciais ou consultas de banco de dados.
 
 ## Instalação no Windows
 
 1. Instale Python 3.11+ e marque **Add Python to PATH**.
 2. No PowerShell, dentro desta pasta, execute `py -3.11 -m venv .venv`, `.\.venv\Scripts\Activate.ps1` e `pip install -r requirements.txt`.
 3. Copie `config.example.json` para `config.json` e ajuste as pastas de origem, se necessário.
-4. Execute `python main.py`.
-
-Para criar o executável: `pyinstaller --noconfirm --windowed --name EventosAvulsos main.py`.
+4. Salve a exportação da view como `base_dw.xlsx` na raiz da automação, ou selecione outro arquivo pela interface.
+5. Execute `python main.py`.
 
 ## Uso
 
-1. Selecione o diretório que contém `1. LETIVA`, `2. NAO LETIVA` e, quando aplicável, as pastas históricas habilitadas no `config.json`.
-2. Use **Validar arquivos** para conferir as pastas encontradas.
-3. Escolha o perfil e use **Prévia do mapeamento** para confirmar a aba reconhecida.
-4. Clique **Executar**. Um novo arquivo é criado em `resultados`; uma saída dentro de qualquer pasta de origem habilitada é bloqueada.
+1. Selecione o diretório que contém as pastas de solicitações configuradas.
+2. Escolha o perfil e use **Prévia do mapeamento** para confirmar a aba reconhecida.
+3. Selecione a base exportada e clique em **Validar base**. Ela precisa ter as colunas `MATRICULA_ADP`, `DATA`, `HORARIO_INICIO HR Relogio`, `HORARIO_FIM HR Relogio`, `TIPO_ATIVIDADE` e `DISCIPLINA_ATIVIDADE_NOME`.
+4. Informe a cobertura da base apenas se quiser restringir as datas aceitas. Deixe em branco para comparar todas as solicitações válidas.
+5. Clique em **Executar**.
 
-O relatório contém as abas **Resumo**, **Letivas**, **Não Letivas**, **Pendências** e **Arquivos processados**.
-
-## Perfis de template
-
-Cada perfil em `config.json` define as abas, a linha de cabeçalho e os campos usados para reconhecer o template. Quando nenhuma ou mais de uma aba corresponder ao perfil, o arquivo é registrado como pendência em vez de ser adivinhado.
+As abas **Letivas** e **Não Letivas** trazem o resultado por registro: `Conflito`, `Sem conflito` ou `Não verificado`. Os detalhes de cada conflito ficam na aba **Detalhamento de conflitos** quando houver ocorrências.
 
 ## Demonstração e testes
 
-Com as dependências instaladas, execute `python exemplos/gerar_dados_ficticios.py` e escolha `exemplos/dados_ficticios` como entrada. Execute os testes com `pytest`.
+Execute `python exemplos/gerar_dados_ficticios.py` e escolha `exemplos/dados_ficticios` como entrada. Execute os testes com `pytest`.

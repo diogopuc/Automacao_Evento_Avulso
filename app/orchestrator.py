@@ -5,9 +5,11 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
+from .conflicts import check_conflicts
 from .discovery import discover_excel_files, output_is_safe, validate_input_directory
+from .dw import load_dw_export
 from .exporter import export_report
-from .models import CancelledError, CancellationToken, RunSummary
+from .models import CancelledError, CancellationToken, Coverage, RunSummary
 from .profiles import Profile
 from .reader import read_requests
 
@@ -27,19 +29,20 @@ class Processor:
 
         return validate_input_directory(input_dir, source_folders(self.config))
 
-    def run(self, input_dir: Path, output_dir: Path, profile: Profile, token: CancellationToken) -> Path:
+    def run(self, input_dir: Path, output_dir: Path, profile: Profile, dw_file: Path, coverage: Coverage | None, token: CancellationToken) -> Path:
         from .config import source_folders
 
         execution_id = str(uuid4())
-        summary = RunSummary(execution_id, datetime.now().isoformat(timespec="seconds"))
+        summary = RunSummary(execution_id, datetime.now().isoformat(timespec="seconds"), f"Arquivo exportado da view: {dw_file.name}")
         folders = source_folders(self.config)
         if not output_is_safe(output_dir, input_dir, folders):
             raise ValueError("A pasta de saída não pode ficar dentro de uma pasta de origem habilitada.")
-
         self._stage("Validando configurações")
         found, missing = self.validate(input_dir)
         if not found:
             raise ValueError("Nenhuma pasta de origem habilitada foi encontrada.")
+        if not dw_file.is_file():
+            raise ValueError("Selecione o arquivo Excel base_dw.xlsx exportado da view.")
 
         issues = [["Pasta ausente", folder.name, "Pasta habilitada não encontrada"] for folder in missing]
         file_rows: list[list[object]] = []
@@ -56,12 +59,11 @@ class Processor:
             work.extend((folder, item) for item in eligible)
         if not work:
             raise ValueError("Nenhum arquivo Excel elegível foi encontrado nas pastas disponíveis.")
-
         for index, (folder, file) in enumerate(work, 1):
             token.raise_if_cancelled()
-            self._stage("Lendo solicitações", 5 + int(index / len(work) * 75), file.name)
+            self._stage("Lendo solicitações", 5 + int(index / len(work) * 45), file.name)
             try:
-                loaded, warnings = read_requests(file, folder.request_type, profile, token)
+                loaded, warnings = read_requests(file, folder.name, folder.request_type, profile, input_dir, execution_id, token)
                 records.extend(loaded)
                 summary.files_processed += 1
                 file_rows.append([folder.request_type, folder.name, file.name, "Processado", "; ".join(warnings)])
@@ -78,11 +80,45 @@ class Processor:
 
         summary.letivas = sum(record.request_type == "letiva" for record in records)
         summary.nao_letivas = sum(record.request_type == "nao_letiva" for record in records)
-        if issues:
+        activities = []
+        failed: str | None = None
+        try:
+            wanted_keys = {(record.matricula, record.activity_date) for record in records if not record.issues}
+            if not wanted_keys:
+                self._stage("Arquivo da view não será carregado", 70, "não há Evento Avulso válido para comparar")
+            else:
+                self._stage("Carregando arquivo exportado da view", 55, dw_file.name)
+                activities = load_dw_export(
+                    dw_file,
+                    token,
+                    lambda done, total: self._stage(
+                        "Carregando arquivo exportado da view",
+                        55 + int(done / total * 15) if total else 70,
+                        f"{done:,} de {total:,} linhas" if total else f"{done:,} linhas processadas",
+                    ),
+                    wanted_keys,
+                )
+        except CancelledError:
+            self.logger.info("Cancelamento confirmado durante a leitura do arquivo da view.")
+            raise
+        except Exception as exc:
+            failed = f"falha ao carregar o arquivo da view: {exc}"
+            summary.status = "Concluído com pendências"
+            issues.append(["Arquivo da view", dw_file.name, failed])
+            self.logger.exception("Falha ao carregar o arquivo da view")
+
+        self._stage("Verificando conflitos", 75)
+        token.raise_if_cancelled()
+        details = check_conflicts(records, activities, coverage, failed)
+        summary.conflicts = sum(record.result_message.startswith("Conflito") for record in records)
+        summary.no_conflicts = sum(record.result_message == "Sem conflito." for record in records)
+        summary.not_verified = len(records) - summary.conflicts - summary.no_conflicts
+        summary.conflict_occurrences = len(details)
+        if issues or summary.not_verified:
             summary.status = "Concluído com pendências"
         self._stage("Gerando relatório", 90)
         token.raise_if_cancelled()
-        output = export_report(output_dir, summary, records, file_rows, issues)
+        output = export_report(output_dir, summary, records, details, file_rows, issues)
         self.last_summary = summary
         self._stage("Finalizando", 100, output.name)
         self.logger.info("Relatório gerado: %s", output)

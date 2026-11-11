@@ -16,7 +16,9 @@
       "first_data_row": 2,
       "fields": {
         "matricula": {"column": "B", "aliases": ["matrícula", "matricula", "matrícula do docente"]},
-        "data": {"column": "F", "aliases": ["data de início da realização da atividade", "data inicio realização", "data"]}
+        "data": {"column": "F", "aliases": ["data de início da realização da atividade", "data inicio realização", "data"]},
+        "inicio": {"column": "W", "aliases": ["horário de início", "horario de inicio", "hora início"]},
+        "fim": {"column": "X", "aliases": ["horário de término", "horario de termino", "hora término"]}
       }
     },
     {
@@ -27,7 +29,9 @@
       "first_data_row": 2,
       "fields": {
         "matricula": {"column": "AB", "aliases": []},
-        "data": {"column": "Q", "aliases": []}
+        "data": {"column": "Q", "aliases": []},
+        "inicio": {"column": "S", "aliases": []},
+        "fim": {"column": "T", "aliases": []}
       }
     }
   ]

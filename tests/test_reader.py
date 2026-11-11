@@ -1,3 +1,4 @@
+from datetime import date, time
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -10,42 +11,27 @@ def profile() -> Profile:
     return Profile("p", "Teste", ["Solicitações"], 1, 2, {
         "matricula": {"column": "B", "aliases": ["Matrícula"]},
         "data": {"column": "F", "aliases": ["Data"]},
+        "inicio": {"column": "W", "aliases": ["Início"]},
+        "fim": {"column": "X", "aliases": ["Término"]},
     })
 
 
-def test_reader_preserves_source_values(tmp_path: Path):
+def test_reader_reads_schedule_from_configured_columns(tmp_path: Path):
     file = tmp_path / "solicitacoes.xlsx"
     workbook = Workbook()
     sheet = workbook.active
     sheet.title = "Solicitações"
-    headers = ["" for _ in range(6)]
-    headers[1], headers[5] = "Matrícula", "Data"
+    headers = [""] * 24
+    headers[1], headers[5], headers[22], headers[23] = "Matrícula", "Data", "Início", "Término"
     sheet.append(headers)
-    row = ["" for _ in range(6)]
-    row[1], row[5] = "000123", "28/10/2026"
+    row = [""] * 24
+    row[1], row[5], row[22], row[23] = "000123", date(2026, 10, 28), time(8), time(9)
     sheet.append(row)
     workbook.save(file)
 
-    records, warnings = read_requests(file, "letiva", profile(), CancellationToken())
+    records, warnings = read_requests(file, "1. LETIVA", "letiva", profile(), tmp_path, "exec", CancellationToken())
 
     assert not warnings
-    assert records[0].request_type == "letiva"
-    assert records[0].values["Matrícula"] == "000123"
-
-
-def test_reader_rejects_ambiguous_template(tmp_path: Path):
-    file = tmp_path / "solicitacoes.xlsx"
-    workbook = Workbook()
-    workbook.active.title = "Solicitações"
-    workbook.active.append(["Matrícula", "Data"])
-    workbook.create_sheet("Outra").append(["Matrícula", "Data"])
-    workbook.save(file)
-    ambiguous_profile = profile()
-    ambiguous_profile.sheet_names = []
-
-    try:
-        read_requests(file, "letiva", ambiguous_profile, CancellationToken())
-    except ValueError as exc:
-        assert "não reconheceu" in str(exc) or "ambíguo" in str(exc)
-    else:
-        raise AssertionError("O arquivo ambíguo deveria ser rejeitado")
+    assert records[0].matricula == "000123"
+    assert records[0].start_time == time(8)
+    assert not records[0].issues

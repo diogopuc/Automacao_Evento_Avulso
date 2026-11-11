@@ -5,7 +5,7 @@ from app.models import Coverage, DwActivity, RequestRecord
 
 
 def request(start: time, end: time) -> RequestRecord:
-    return RequestRecord({}, "letiva", "0001", date(2026, 10, 28), start, end, "a.xlsx", "a.xlsx", "A", 2, "1. LETIVA", "p", "r", "e")
+    return RequestRecord({}, "0001", date(2026, 10, 28), start, end, "a.xlsx", "a.xlsx", "A", 2, "1. LETIVA", "p", "r", "e")
 
 
 def test_overlapping_activity_is_reported_as_conflict():

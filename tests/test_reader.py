@@ -29,7 +29,7 @@ def test_reader_reads_schedule_from_configured_columns(tmp_path: Path):
     sheet.append(row)
     workbook.save(file)
 
-    records, warnings = read_requests(file, "1. LETIVA", "letiva", profile(), tmp_path, "exec", CancellationToken())
+    records, warnings = read_requests(file, "1. LETIVA", profile(), tmp_path, "exec", CancellationToken())
 
     assert not warnings
     assert records[0].matricula == "000123"

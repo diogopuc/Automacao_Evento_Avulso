@@ -2,10 +2,8 @@
   "input_directory": "C:\\Users\\diogo.jooliveira\\Grupo Marista\\Diretório Controle Acadêmico - Documentos\\10_Analistas\\10.10_Diogo\\17 - Evento Avulso Automação",
   "output_directory": "C:\\Users\\diogo.jooliveira\\Grupo Marista\\Diretório Controle Acadêmico - Documentos\\10_Analistas\\10.10_Diogo\\17 - Evento Avulso Automação\\resultados",
   "source_folders": [
-    {"name": "1. LETIVA", "request_type": "letiva", "enabled": true},
-    {"name": "3. LETIVA - Anterior_Maio.25", "request_type": "letiva", "enabled": true},
-    {"name": "2. NAO LETIVA", "request_type": "nao_letiva", "enabled": true},
-    {"name": "3.1 NAO LETIVA - Anterior_Maio.25", "request_type": "nao_letiva", "enabled": true}
+    {"name": "1. LETIVA", "enabled": true},
+    {"name": "3. LETIVA - Anterior_Maio.25", "enabled": true}
   ],
   "profiles": [
     {

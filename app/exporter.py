@@ -71,7 +71,6 @@ def _summary_sheet(workbook: Workbook, summary: RunSummary) -> None:
         ("Arquivos processados", summary.files_processed),
         ("Arquivos com erro", summary.files_with_error),
         ("Solicitações letivas", summary.letivas),
-        ("Solicitações não letivas", summary.nao_letivas),
         ("Eventos com conflito", summary.conflicts),
         ("Eventos sem conflito", summary.no_conflicts),
         ("Eventos não verificados", summary.not_verified),
@@ -104,12 +103,11 @@ def export_report(output_dir: Path, summary: RunSummary, records: list[RequestRe
     workbook = Workbook()
     workbook.remove(workbook.active)
     _summary_sheet(workbook, summary)
-    _write_sheet(workbook, "Letivas", [record for record in records if record.request_type == "letiva"])
-    _write_sheet(workbook, "Não Letivas", [record for record in records if record.request_type == "nao_letiva"])
+    _write_sheet(workbook, "Letivas", records)
     _simple_table(workbook, "Pendências", ["Categoria", "Origem", "Mensagem"], issues)
-    _simple_table(workbook, "Arquivos processados", ["Tipo", "Pasta", "Arquivo", "Status", "Mensagem"], file_rows)
+    _simple_table(workbook, "Arquivos processados", ["Pasta", "Arquivo", "Status", "Mensagem"], file_rows)
     if details:
-        _simple_table(workbook, "Detalhamento de conflitos", ["ID do registro", "Tipo da solicitação", "Matrícula", "Data", "Início Evento", "Fim Evento", "Início DW", "Fim DW", "Tipo DW", "Atividade DW"], [[detail.request_id, detail.request_type, detail.matricula, detail.activity_date, detail.event_start, detail.event_end, detail.dw_start, detail.dw_end, detail.dw_type, detail.dw_description] for detail in details])
+        _simple_table(workbook, "Detalhamento de conflitos", ["ID do registro", "Matrícula", "Data", "Início Evento", "Fim Evento", "Início DW", "Fim DW", "Tipo DW", "Atividade DW"], [[detail.request_id, detail.matricula, detail.activity_date, detail.event_start, detail.event_end, detail.dw_start, detail.dw_end, detail.dw_type, detail.dw_description] for detail in details])
     filename = f"consolidado_eventos_avulsos_{datetime.now():%Y%m%d_%H%M%S}_{summary.execution_id[:8]}.xlsx"
     target = output_dir / filename
     temporary = target.with_suffix(".tmp.xlsx")

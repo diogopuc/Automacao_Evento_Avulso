@@ -12,13 +12,13 @@ Aplicação desktop para consolidar solicitações de Eventos Avulsos e verifica
 
 ## Uso
 
-1. Selecione o diretório que contém as pastas de solicitações configuradas.
+1. Selecione o diretório que contém `1. LETIVA` e, se aplicável, a pasta histórica letiva configurada.
 2. Escolha o perfil e use **Prévia do mapeamento** para confirmar a aba reconhecida.
 3. Selecione a base exportada e clique em **Validar base**. Ela precisa ter as colunas `MATRICULA_ADP`, `DATA`, `HORARIO_INICIO HR Relogio`, `HORARIO_FIM HR Relogio`, `TIPO_ATIVIDADE` e `DISCIPLINA_ATIVIDADE_NOME`.
 4. Informe a cobertura da base apenas se quiser restringir as datas aceitas. Deixe em branco para comparar todas as solicitações válidas.
 5. Clique em **Executar**.
 
-As abas **Letivas** e **Não Letivas** trazem o resultado por registro: `Conflito`, `Sem conflito` ou `Não verificado`. Os detalhes de cada conflito ficam na aba **Detalhamento de conflitos** quando houver ocorrências.
+A aba **Letivas** traz o resultado por registro: `Conflito`, `Sem conflito` ou `Não verificado`. Os detalhes de cada conflito ficam na aba **Detalhamento de conflitos** quando houver ocorrências.
 
 ## Demonstração e testes
 

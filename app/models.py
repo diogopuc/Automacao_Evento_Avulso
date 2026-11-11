@@ -9,7 +9,6 @@ from typing import Any
 @dataclass(frozen=True)
 class SourceFolder:
     name: str
-    request_type: str
     enabled: bool = True
 
 
@@ -26,7 +25,6 @@ class Profile:
 @dataclass
 class RequestRecord:
     values: dict[str, Any]
-    request_type: str
     matricula: str | None
     activity_date: date | None
     start_time: time | None
@@ -60,7 +58,6 @@ class DwActivity:
 @dataclass(frozen=True)
 class ConflictDetail:
     request_id: str
-    request_type: str
     matricula: str
     activity_date: date
     event_start: time
@@ -92,7 +89,6 @@ class RunSummary:
     files_processed: int = 0
     files_with_error: int = 0
     letivas: int = 0
-    nao_letivas: int = 0
     conflicts: int = 0
     no_conflicts: int = 0
     not_verified: int = 0

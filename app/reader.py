@@ -11,7 +11,7 @@ from .normalize import normalize_id, parse_date, parse_time
 from .profiles import resolve_profile_sheet
 
 
-def read_requests(path: Path, folder_name: str, request_type: str, profile: Profile, root: Path, execution_id: str, token: CancellationToken) -> tuple[list[RequestRecord], list[str]]:
+def read_requests(path: Path, folder_name: str, profile: Profile, root: Path, execution_id: str, token: CancellationToken) -> tuple[list[RequestRecord], list[str]]:
     try:
         workbook = load_workbook(path, read_only=True, data_only=False, keep_vba=path.suffix.lower() == ".xlsm")
     except Exception as exc:
@@ -39,7 +39,6 @@ def read_requests(path: Path, folder_name: str, request_type: str, profile: Prof
 
         record = RequestRecord(
             values=values,
-            request_type=request_type,
             matricula=normalize_id(cell_value("matricula")),
             activity_date=parse_date(cell_value("data")),
             start_time=parse_time(cell_value("inicio")),

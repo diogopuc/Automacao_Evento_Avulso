@@ -56,7 +56,7 @@ def check_conflicts(records: list[RequestRecord], activities: list[DwActivity] |
             activity_type = activity.activity_type.strip() if activity.activity_type else "Não informado"
             description = activity.description.strip() if activity.description else "Não informada"
             lines.append(f"Conflito com atividade do Agenda em {_format_date(activity.activity_date)}, das {_format_time(activity.start_time)} às {_format_time(activity.end_time)} - tipo: {activity_type}; atividade: {description}. Evento Avulso em {_format_date(record.activity_date)}, das {_format_time(record.start_time)} às {_format_time(record.end_time)}.")
-            details.append(ConflictDetail(record.record_id, record.request_type, record.matricula, record.activity_date, record.start_time, record.end_time, activity.start_time, activity.end_time, activity_type, description))
+            details.append(ConflictDetail(record.record_id, record.matricula, record.activity_date, record.start_time, record.end_time, activity.start_time, activity.end_time, activity_type, description))
         message = "\n".join(lines)
         record.result_message = message if len(message) <= 32000 else f"Conflitos encontrados: {len(hits)}. Consulte a aba Detalhamento de conflitos."
     return details

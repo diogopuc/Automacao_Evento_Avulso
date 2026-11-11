@@ -24,9 +24,7 @@ def save_request(path: Path, registration: str, activity_date: date, start: time
 
 def main() -> None:
     (ROOT / "1. LETIVA").mkdir(parents=True, exist_ok=True)
-    (ROOT / "2. NAO LETIVA").mkdir(exist_ok=True)
     save_request(ROOT / "1. LETIVA" / "letiva.xlsx", "000123", date(2026, 10, 28), time(8), time(9))
-    save_request(ROOT / "2. NAO LETIVA" / "nao_letiva.xlsx", "000124", date(2026, 10, 28), time(10), time(11))
     workbook = Workbook()
     sheet = workbook.active
     sheet.append(["MATRICULA_ADP", "DATA", "HORARIO_INICIO HR Relogio", "HORARIO_FIM HR Relogio", "TIPO_ATIVIDADE", "DISCIPLINA_ATIVIDADE_NOME"])

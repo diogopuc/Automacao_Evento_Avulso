@@ -53,7 +53,7 @@ class Processor:
             eligible, ignored = discover_excel_files(path)
             summary.files_found += len(eligible)
             for item in ignored:
-                file_rows.append([folder.request_type, folder.name, item.name, "Ignorado", "Temporário ou formato não suportado"])
+                file_rows.append([folder.name, item.name, "Ignorado", "Temporário ou formato não suportado"])
             if not eligible:
                 issues.append(["Pasta sem arquivo", folder.name, "Nenhum arquivo disponível para processamento"])
             work.extend((folder, item) for item in eligible)
@@ -63,10 +63,10 @@ class Processor:
             token.raise_if_cancelled()
             self._stage("Lendo solicitações", 5 + int(index / len(work) * 45), file.name)
             try:
-                loaded, warnings = read_requests(file, folder.name, folder.request_type, profile, input_dir, execution_id, token)
+                loaded, warnings = read_requests(file, folder.name, profile, input_dir, execution_id, token)
                 records.extend(loaded)
                 summary.files_processed += 1
-                file_rows.append([folder.request_type, folder.name, file.name, "Processado", "; ".join(warnings)])
+                file_rows.append([folder.name, file.name, "Processado", "; ".join(warnings)])
                 issues.extend([["Leitura", file.name, warning] for warning in warnings])
             except CancelledError:
                 self.logger.info("Cancelamento solicitado durante a leitura de %s", file.name)
@@ -74,12 +74,11 @@ class Processor:
             except Exception as exc:
                 summary.files_with_error += 1
                 summary.status = "Concluído com pendências"
-                file_rows.append([folder.request_type, folder.name, file.name, "Erro", str(exc)])
+                file_rows.append([folder.name, file.name, "Erro", str(exc)])
                 issues.append(["Arquivo", file.name, str(exc)])
                 self.logger.exception("Falha ao ler arquivo %s", file.name)
 
-        summary.letivas = sum(record.request_type == "letiva" for record in records)
-        summary.nao_letivas = sum(record.request_type == "nao_letiva" for record in records)
+        summary.letivas = len(records)
         activities = []
         failed: str | None = None
         try:

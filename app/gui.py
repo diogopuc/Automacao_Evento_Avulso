@@ -208,7 +208,7 @@ class Application(ttk.Frame):
                 processor = Processor(self.config_data, logger, lambda stage, percentage, current: self.events.put(("progress", (stage, percentage, current))))
                 result = processor.run(Path(self.input_var.get()), Path(self.output_var.get()), self._profile(), Path(self.dw_file_var.get()), coverage, self.token)
                 summary = processor.last_summary
-                message = f"{summary.status}. Letivas: {summary.letivas}; não letivas: {summary.nao_letivas}; conflitos: {summary.conflicts}; sem conflito: {summary.no_conflicts}; não verificados: {summary.not_verified}. Relatório: {result.name}"
+                message = f"{summary.status}. Letivas: {summary.letivas}; conflitos: {summary.conflicts}; sem conflito: {summary.no_conflicts}; não verificados: {summary.not_verified}. Relatório: {result.name}"
                 self.events.put(("done", (result, message)))
             except Exception as exc:
                 message = "Execução cancelada." if self.token and self.token.is_cancelled else str(exc)

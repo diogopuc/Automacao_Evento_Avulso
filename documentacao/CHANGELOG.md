@@ -6,6 +6,12 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.11.0 - 2026-11-17
+
+### Alterado
+
+- Interface reorganizada conforme o guia visual PUCPR, com paleta institucional, tipografia adaptável e seções de configuração e acompanhamento.
+
 ## v1.10.0 - 2026-11-17
 
 ### Alterado

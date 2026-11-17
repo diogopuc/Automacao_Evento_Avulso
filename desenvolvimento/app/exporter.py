@@ -115,9 +115,9 @@ def export_report(output_dir: Path, summary: RunSummary, records: list[RequestRe
     _simple_table(technical, "Rastreabilidade", ["ID do registro", "Arquivo de origem", "Aba de origem", "Linha de origem"], [[record.record_id, safe_text(record.source_file), safe_text(record.source_sheet), record.source_row] for record in records])
     if details:
         _simple_table(technical, "Detalhamento de conflitos", ["ID do registro", "Matrícula", "Data", "Início Evento", "Fim Evento", "Início DW", "Fim DW", "Tipo DW", "Atividade DW"], [[detail.request_id, detail.matricula, detail.activity_date, detail.event_start, detail.event_end, detail.dw_start, detail.dw_end, detail.dw_type, detail.dw_description] for detail in details])
-    target = output_dir / "irregularidades_EV.xlsx"
+    target = output_dir / "irregularidades_let_ev.xlsx"
     technical_target = output_dir / "detalhes_irregularidades_EV.xlsx"
-    temporary = output_dir / f".irregularidades_EV_{uuid4().hex}.tmp.xlsx"
+    temporary = output_dir / f".irregularidades_let_ev_{uuid4().hex}.tmp.xlsx"
     technical_temporary = output_dir / f".detalhes_irregularidades_EV_{uuid4().hex}.tmp.xlsx"
     try:
         workbook.save(temporary)

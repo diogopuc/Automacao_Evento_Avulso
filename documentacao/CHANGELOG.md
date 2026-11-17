@@ -6,6 +6,12 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.13.1 - 2026-11-17
+
+### Alterado
+
+- Renomeado o relatório principal para `irregularidades_let_ev.xlsx`.
+
 ## v1.13.0 - 2026-11-17
 
 ### Alterado

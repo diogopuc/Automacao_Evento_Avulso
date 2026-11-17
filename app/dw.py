@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Callable, Iterator
 from xml.etree import ElementTree as ET
 
-from openpyxl.utils.cell import column_index_from_string, get_column_letter
 from openpyxl.utils.datetime import from_excel
 
 from .models import CancellationToken, DwActivity
@@ -163,7 +162,7 @@ def load_dw_export(
             issues.append("Data inválida no arquivo da view")
         if not start_time or not end_time or end_time <= start_time:
             issues.append("Intervalo inválido no arquivo da view")
-        activities.append(DwActivity(matricula, activity_date, start_time, end_time, str(row.get(columns["tipo"]) or ""), str(row.get(columns["descricao"]) or ""), row_number, tuple(issues)))
+        activities.append(DwActivity(matricula, activity_date, start_time, end_time, str(row.get(columns["tipo"]) or ""), str(row.get(columns["descricao"]) or ""), tuple(issues)))
         if on_progress and processed % 1000 == 0:
             on_progress(processed, total)
     if token:

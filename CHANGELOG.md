@@ -6,6 +6,13 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.8.1 - 2026-11-17
+
+### Alterado
+
+- Removidos atributos de rastreabilidade e contagem que eram preenchidos, mas não eram utilizados no processamento ou nos relatórios.
+- Removidas importações e regra de arquivo ignorado duplicada.
+
 ## v1.8.0 - 2026-11-17
 
 ### Alterado

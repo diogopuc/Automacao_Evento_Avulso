@@ -5,7 +5,7 @@ from app.rest_rules import check_rest_rules
 
 
 def record(day: date, start: time, end: time, identifier: str = "1") -> RequestRecord:
-    return RequestRecord({}, "0001", day, start, end, f"{identifier}.xlsx", f"{identifier}.xlsx", "Solicitações", 2, "1. LETIVA", "p", identifier, "exec")
+    return RequestRecord({}, "0001", day, start, end, identifier)
 
 
 def test_intrajornada_requires_fifteen_minutes_for_five_to_six_hours():

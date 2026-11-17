@@ -50,7 +50,6 @@ def check_conflicts(records: list[RequestRecord], activities: list[DwActivity] |
             continue
         types = unique_preserve([activity.activity_type.strip() if activity.activity_type else "Não informado" for activity in hits])
         record.result_type = "; ".join(types)
-        record.conflict_count = len(hits)
         lines: list[str] = []
         for activity in hits:
             activity_type = activity.activity_type.strip() if activity.activity_type else "Não informado"

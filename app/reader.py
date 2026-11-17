@@ -11,7 +11,7 @@ from .normalize import normalize_id, parse_date, parse_time
 from .profiles import resolve_profile_sheet
 
 
-def read_requests(path: Path, folder_name: str, profile: Profile, root: Path, execution_id: str, token: CancellationToken) -> tuple[list[RequestRecord], list[str]]:
+def read_requests(path: Path, profile: Profile, token: CancellationToken) -> tuple[list[RequestRecord], list[str]]:
     try:
         workbook = load_workbook(path, read_only=True, data_only=False, keep_vba=path.suffix.lower() == ".xlsm")
     except Exception as exc:
@@ -26,7 +26,7 @@ def read_requests(path: Path, folder_name: str, profile: Profile, root: Path, ex
         safe_headers.append(header if seen[header] == 1 else f"{header} ({seen[header]})")
     records: list[RequestRecord] = []
     warnings: list[str] = []
-    for row_number, row in enumerate(sheet.iter_rows(min_row=profile.first_data_row, values_only=False), start=profile.first_data_row):
+    for row in sheet.iter_rows(min_row=profile.first_data_row, values_only=False):
         token.raise_if_cancelled()
         raw = [cell.value for cell in row]
         if not any(value not in (None, "") for value in raw):
@@ -43,14 +43,7 @@ def read_requests(path: Path, folder_name: str, profile: Profile, root: Path, ex
             activity_date=parse_date(cell_value("data")),
             start_time=parse_time(cell_value("inicio")),
             end_time=parse_time(cell_value("fim")),
-            source_file=path.name,
-            relative_path=str(path.relative_to(root)),
-            source_sheet=sheet.title,
-            source_row=row_number,
-            source_folder=folder_name,
-            profile_id=profile.id,
             record_id=str(uuid4()),
-            execution_id=execution_id,
         )
         if not record.matricula:
             record.issues.append("Matrícula ausente ou inválida")

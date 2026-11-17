@@ -29,20 +29,12 @@ class RequestRecord:
     activity_date: date | None
     start_time: time | None
     end_time: time | None
-    source_file: str
-    relative_path: str
-    source_sheet: str
-    source_row: int
-    source_folder: str
-    profile_id: str
     record_id: str
-    execution_id: str
     issues: list[str] = field(default_factory=list)
     result_type: str = ""
     result_message: str = ""
     intrajornada_message: str = ""
     interjornada_message: str = ""
-    conflict_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -53,7 +45,6 @@ class DwActivity:
     end_time: time | None
     activity_type: str | None
     description: str | None
-    source_row: int | None = None
     issues: tuple[str, ...] = ()
 
 
@@ -75,7 +66,6 @@ class Coverage:
     confirmed: bool = False
     start: date | None = None
     end: date | None = None
-    description: str = ""
 
     def contains(self, value: date | None) -> bool:
         return bool(self.confirmed and value and self.start and self.end and self.start <= value <= self.end)

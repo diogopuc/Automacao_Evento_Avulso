@@ -64,7 +64,7 @@ class Processor:
             token.raise_if_cancelled()
             self._stage("Lendo solicitações", 5 + int(index / len(work) * 45), file.name)
             try:
-                loaded, warnings = read_requests(file, folder.name, profile, input_dir, execution_id, token)
+                loaded, warnings = read_requests(file, profile, token)
                 records.extend(loaded)
                 summary.files_processed += 1
                 file_rows.append([folder.name, file.name, "Processado", "; ".join(warnings)])

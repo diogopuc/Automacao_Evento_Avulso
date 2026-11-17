@@ -106,24 +106,33 @@ def export_report(output_dir: Path, summary: RunSummary, records: list[RequestRe
     output_dir.mkdir(parents=True, exist_ok=True)
     workbook = Workbook()
     workbook.remove(workbook.active)
-    _summary_sheet(workbook, summary)
     _write_sheet(workbook, "Letivas", records)
-    _simple_table(workbook, "Pendências", ["Categoria", "Origem", "Mensagem"], issues)
-    _simple_table(workbook, "Arquivos processados", ["Pasta", "Arquivo", "Status", "Mensagem"], file_rows)
-    _simple_table(workbook, "Rastreabilidade", ["ID do registro", "Arquivo de origem", "Aba de origem", "Linha de origem"], [[record.record_id, safe_text(record.source_file), safe_text(record.source_sheet), record.source_row] for record in records])
+    technical = Workbook()
+    technical.remove(technical.active)
+    _summary_sheet(technical, summary)
+    _simple_table(technical, "Pendências", ["Categoria", "Origem", "Mensagem"], issues)
+    _simple_table(technical, "Arquivos processados", ["Pasta", "Arquivo", "Status", "Mensagem"], file_rows)
+    _simple_table(technical, "Rastreabilidade", ["ID do registro", "Arquivo de origem", "Aba de origem", "Linha de origem"], [[record.record_id, safe_text(record.source_file), safe_text(record.source_sheet), record.source_row] for record in records])
     if details:
-        _simple_table(workbook, "Detalhamento de conflitos", ["ID do registro", "Matrícula", "Data", "Início Evento", "Fim Evento", "Início DW", "Fim DW", "Tipo DW", "Atividade DW"], [[detail.request_id, detail.matricula, detail.activity_date, detail.event_start, detail.event_end, detail.dw_start, detail.dw_end, detail.dw_type, detail.dw_description] for detail in details])
+        _simple_table(technical, "Detalhamento de conflitos", ["ID do registro", "Matrícula", "Data", "Início Evento", "Fim Evento", "Início DW", "Fim DW", "Tipo DW", "Atividade DW"], [[detail.request_id, detail.matricula, detail.activity_date, detail.event_start, detail.event_end, detail.dw_start, detail.dw_end, detail.dw_type, detail.dw_description] for detail in details])
     target = output_dir / "irregularidades_EV.xlsx"
+    technical_target = output_dir / "detalhes_irregularidades_EV.xlsx"
     temporary = output_dir / f".irregularidades_EV_{uuid4().hex}.tmp.xlsx"
+    technical_temporary = output_dir / f".detalhes_irregularidades_EV_{uuid4().hex}.tmp.xlsx"
     try:
         workbook.save(temporary)
+        technical.save(technical_temporary)
         load_workbook(temporary, read_only=True).close()
-        if target.exists():
-            versions = output_dir / "versionamento"
-            versions.mkdir(exist_ok=True)
-            archive = versions / f"irregularidades_EV_{datetime.now():%Y%m%d_%H%M%S}_{uuid4().hex[:8]}.xlsx"
-            shutil.copy2(target, archive)
+        load_workbook(technical_temporary, read_only=True).close()
+        for existing in (target, technical_target):
+            if existing.exists():
+                versions = output_dir / "versionamento"
+                versions.mkdir(exist_ok=True)
+                archive = versions / f"{existing.stem}_{datetime.now():%Y%m%d_%H%M%S}_{uuid4().hex[:8]}.xlsx"
+                shutil.copy2(existing, archive)
+        os.replace(technical_temporary, technical_target)
         os.replace(temporary, target)
     finally:
         temporary.unlink(missing_ok=True)
+        technical_temporary.unlink(missing_ok=True)
     return target

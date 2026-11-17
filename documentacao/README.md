@@ -28,7 +28,7 @@ Para gerar novamente o executável em Windows, execute na pasta `desenvolvimento
 4. Informe a cobertura confirmada da base. Sem ela, a ausência de conflito e os descansos serão marcados como não verificados. Para a interjornada, a cobertura deve incluir também os dias anterior e seguinte.
 5. Clique em **Executar**.
 
-O relatório atual é salvo em `resultados/irregularidades_EV.xlsx`. Antes de cada substituição, a versão anterior é copiada para `resultados/versionamento`.
+O relatório principal é salvo em `resultados/irregularidades_EV.xlsx` e contém somente a aba `Letivas`. As demais informações ficam em `resultados/detalhes_irregularidades_EV.xlsx`. Antes de cada substituição, as versões anteriores são copiadas para `resultados/versionamento`.
 
 A aba **Letivas** traz o resultado por registro: `Conflito`, `Sem conflito` ou `Não verificado`. Os detalhes de cada conflito ficam na aba **Detalhamento de conflitos** quando houver ocorrências.
 

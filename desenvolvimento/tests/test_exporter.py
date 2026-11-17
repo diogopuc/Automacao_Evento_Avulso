@@ -12,12 +12,16 @@ def test_export_includes_conflict_result_without_duplicate_filters(tmp_path):
     summary = RunSummary("exec-1", "2026-10-28T08:00:00", "Arquivo exportado da view: base_dw.xlsx", letivas=1, no_conflicts=1)
     output = export_report(tmp_path, summary, [record], [], [["1. LETIVA", "origem.xlsx", "Processado", ""]], [])
     workbook = load_workbook(output, data_only=True)
+    assert workbook.sheetnames == ["Letivas"]
+    technical = load_workbook(tmp_path / "detalhes_irregularidades_EV.xlsx", data_only=True)
+    assert technical.sheetnames == ["Resumo", "Pendências", "Arquivos processados", "Rastreabilidade"]
+    technical.close()
     headers = [cell.value for cell in workbook["Letivas"][1]]
     assert "Resultado da verificação" in headers
     assert "Validação intrajornada" in headers and "Validação interjornada" in headers
     assert workbook["Letivas"].cell(2, headers.index("Resultado da verificação") + 1).value == "Sem conflito."
     with ZipFile(output) as archive:
-        worksheet_xml = archive.read("xl/worksheets/sheet2.xml").decode("utf-8")
+        worksheet_xml = archive.read("xl/worksheets/sheet1.xml").decode("utf-8")
         assert "<autoFilter" not in worksheet_xml
 
 
@@ -28,11 +32,11 @@ def test_export_preserves_previous_report_before_replacing_it(tmp_path):
     assert target.name == "irregularidades_EV.xlsx"
     export_report(tmp_path, second, [], [], [], [])
     archives = list((tmp_path / "versionamento").glob("*.xlsx"))
-    assert len(archives) == 1
-    old_workbook = load_workbook(archives[0], read_only=True)
+    assert len(archives) == 2
+    old_workbook = load_workbook(next(path for path in archives if path.name.startswith("detalhes_")), read_only=True)
     assert old_workbook["Resumo"]["B1"].value == "first"
     old_workbook.close()
-    current_workbook = load_workbook(target, read_only=True)
+    current_workbook = load_workbook(tmp_path / "detalhes_irregularidades_EV.xlsx", read_only=True)
     assert current_workbook["Resumo"]["B1"].value == "second"
     current_workbook.close()
 

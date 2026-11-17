@@ -6,6 +6,13 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.13.0 - 2026-11-17
+
+### Alterado
+
+- O arquivo `irregularidades_EV.xlsx` contém somente a aba `Letivas`.
+- Resumo, pendências, arquivos processados, rastreabilidade e detalhes de conflitos passaram para `detalhes_irregularidades_EV.xlsx`, com preservação das versões anteriores.
+
 ## v1.12.0 - 2026-11-17
 
 ### Corrigido

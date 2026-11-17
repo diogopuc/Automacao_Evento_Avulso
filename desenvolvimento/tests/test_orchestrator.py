@@ -29,7 +29,10 @@ def test_complete_run_reports_conflicts_and_traceability(tmp_path):
     processor = Processor({"source_folders": [{"name": "1. LETIVA", "enabled": True}]}, logging.getLogger("test"))
     result = processor.run(tmp_path, tmp_path / "saida", profile, base, Coverage(True, date(2026, 11, 16), date(2026, 11, 18)), CancellationToken())
     assert processor.last_summary.conflicts == 2
-    report = load_workbook(result, data_only=True)
+    principal = load_workbook(result, data_only=True)
+    assert principal.sheetnames == ["Letivas"]
+    principal.close()
+    report = load_workbook(result.parent / "detalhes_irregularidades_EV.xlsx", data_only=True)
     assert report["Rastreabilidade"].max_row == 3
     assert report["Detalhamento de conflitos"].max_row == 3
     assert report["Rastreabilidade"]["D2"].value == 2

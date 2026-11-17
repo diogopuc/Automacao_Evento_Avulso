@@ -30,6 +30,9 @@ class RequestRecord:
     start_time: time | None
     end_time: time | None
     record_id: str
+    source_file: str = ""
+    source_sheet: str = ""
+    source_row: int = 0
     issues: list[str] = field(default_factory=list)
     result_type: str = ""
     result_message: str = ""
@@ -85,6 +88,9 @@ class RunSummary:
     no_conflicts: int = 0
     not_verified: int = 0
     conflict_occurrences: int = 0
+    intra_irregular: int = 0
+    inter_irregular: int = 0
+    rest_not_verified: int = 0
 
 
 class CancelledError(Exception):

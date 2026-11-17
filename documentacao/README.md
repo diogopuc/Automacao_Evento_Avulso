@@ -25,12 +25,14 @@ Para gerar novamente o executável em Windows, execute na pasta `desenvolvimento
 1. Selecione o diretório que contém `1. LETIVA` e, se aplicável, a pasta histórica letiva configurada.
 2. Escolha o perfil e use **Prévia do mapeamento** para confirmar a aba reconhecida.
 3. Selecione a base exportada e clique em **Validar base**. Ela precisa ter as colunas `MATRICULA_ADP`, `DATA`, `HORARIO_INICIO HR Relogio`, `HORARIO_FIM HR Relogio`, `TIPO_ATIVIDADE` e `DISCIPLINA_ATIVIDADE_NOME`.
-4. Informe a cobertura da base apenas se quiser restringir as datas aceitas. Deixe em branco para comparar todas as solicitações válidas.
+4. Informe a cobertura confirmada da base. Sem ela, a ausência de conflito e os descansos serão marcados como não verificados. Para a interjornada, a cobertura deve incluir também os dias anterior e seguinte.
 5. Clique em **Executar**.
 
 O relatório atual é salvo em `resultados/irregularidades_EV.xlsx`. Antes de cada substituição, a versão anterior é copiada para `resultados/versionamento`.
 
 A aba **Letivas** traz o resultado por registro: `Conflito`, `Sem conflito` ou `Não verificado`. Os detalhes de cada conflito ficam na aba **Detalhamento de conflitos** quando houver ocorrências.
+
+A aba **Rastreabilidade** relaciona o identificador de cada registro ao arquivo, à aba e à linha de origem. Solicitações avulsas sobrepostas também são apontadas como conflitos.
 
 ## Descansos entre jornadas
 

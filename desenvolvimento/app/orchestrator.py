@@ -112,6 +112,10 @@ class Processor:
             issues.append(["Arquivo da view", dw_file.name, failed])
             self.logger.exception("Falha ao carregar o arquivo da view")
 
+        if missing or summary.files_with_error:
+            reason = "há pastas de origem ausentes ou arquivos não processados; a verificação pode estar incompleta"
+            failed = f"{failed}; {reason}" if failed else reason
+
         self._stage("Verificando conflitos", 75)
         token.raise_if_cancelled()
         details = check_conflicts(records, activities, coverage, failed)
@@ -121,7 +125,10 @@ class Processor:
         summary.no_conflicts = sum(record.result_message == "Sem conflito." for record in records)
         summary.not_verified = len(records) - summary.conflicts - summary.no_conflicts
         summary.conflict_occurrences = len(details)
-        if issues or summary.not_verified:
+        summary.intra_irregular = sum(r.intrajornada_message.startswith("Não conforme") for r in records)
+        summary.inter_irregular = sum(r.interjornada_message.startswith("Não conforme") for r in records)
+        summary.rest_not_verified = sum(r.intrajornada_message.startswith("Não verificado") or r.interjornada_message.startswith("Não verificado") for r in records)
+        if issues or summary.not_verified or summary.intra_irregular or summary.inter_irregular or summary.rest_not_verified:
             summary.status = "Concluído com pendências"
         self._stage("Gerando relatório", 90)
         token.raise_if_cancelled()

@@ -26,7 +26,7 @@ def read_requests(path: Path, profile: Profile, token: CancellationToken) -> tup
         safe_headers.append(header if seen[header] == 1 else f"{header} ({seen[header]})")
     records: list[RequestRecord] = []
     warnings: list[str] = []
-    for row in sheet.iter_rows(min_row=profile.first_data_row, values_only=False):
+    for row_number, row in enumerate(sheet.iter_rows(min_row=profile.first_data_row, values_only=False), start=profile.first_data_row):
         token.raise_if_cancelled()
         raw = [cell.value for cell in row]
         if not any(value not in (None, "") for value in raw):
@@ -44,6 +44,7 @@ def read_requests(path: Path, profile: Profile, token: CancellationToken) -> tup
             start_time=parse_time(cell_value("inicio")),
             end_time=parse_time(cell_value("fim")),
             record_id=str(uuid4()),
+            source_file=str(path), source_sheet=sheet.title, source_row=row_number,
         )
         if not record.matricula:
             record.issues.append("Matrícula ausente ou inválida")

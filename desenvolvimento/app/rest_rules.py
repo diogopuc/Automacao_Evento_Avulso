@@ -74,6 +74,8 @@ def check_rest_rules(records: list[RequestRecord], activities: list[DwActivity] 
 
     schedules_raw: dict[tuple[str, date], list[tuple[time, time]]] = defaultdict(list)
     invalid_keys: set[tuple[str, date]] = set()
+    uncertain_teachers = {record.matricula for record in records if record.issues and record.matricula}
+    unknown_teacher = any(record.issues and not record.matricula for record in records)
     for activity in activities:
         if not activity.matricula or not activity.activity_date:
             continue
@@ -95,12 +97,12 @@ def check_rest_rules(records: list[RequestRecord], activities: list[DwActivity] 
             continue
         key = (record.matricula, record.activity_date)
         adjacent_keys = {key, (record.matricula, record.activity_date - timedelta(days=1)), (record.matricula, record.activity_date + timedelta(days=1))}
-        if invalid_keys.intersection(adjacent_keys):
+        if invalid_keys.intersection(adjacent_keys) or unknown_teacher or record.matricula in uncertain_teachers:
             message = "Não verificado - há atividade da base com dados inválidos no período analisado."
             record.intrajornada_message = message
             record.interjornada_message = message
             continue
-        if coverage and coverage.confirmed and not all(coverage.contains(day) for _, day in adjacent_keys):
+        if not coverage or not all(coverage.contains(day) for _, day in adjacent_keys):
             message = "Não verificado - período necessário fora da cobertura confirmada da base."
             record.intrajornada_message = message
             record.interjornada_message = message

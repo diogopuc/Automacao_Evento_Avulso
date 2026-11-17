@@ -148,6 +148,10 @@ def load_dw_export(
             token.raise_if_cancelled()
         matricula = normalize_id(row.get(columns["matricula"]))
         activity_date = parse_date(_date_value(row.get(columns["data"])))
+        if not any(value not in (None, "") for value in row.values()):
+            continue
+        if not matricula or not activity_date:
+            raise ValueError(f"Linha {row_number} da base possui matrícula ou data ausente ou inválida; não é possível garantir a comparação.")
         start_time = parse_time(_date_value(row.get(columns["inicio"])))
         end_time = parse_time(_date_value(row.get(columns["fim"])))
         key = (matricula, activity_date)

@@ -6,6 +6,15 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.12.0 - 2026-11-17
+
+### Corrigido
+
+- Ausência de cobertura confirmada e dados inválidos não produzem mais resultados de ausência de conflito ou descanso conforme.
+- Adicionada detecção de conflitos entre solicitações avulsas e validação de datas de cobertura.
+- Cabeçalhos ambíguos ou incompatíveis deixam de ser aceitos silenciosamente.
+- Incluídos os totais de descansos irregulares no resumo e uma aba de rastreabilidade por registro.
+
 ## v1.11.0 - 2026-11-17
 
 ### Alterado

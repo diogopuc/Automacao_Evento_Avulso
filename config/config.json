@@ -32,6 +32,7 @@
           "aliases": [
             "data de início da realização da atividade",
             "data inicio realização",
+            "data inicio - realização",
             "data"
           ]
         },
@@ -40,7 +41,8 @@
           "aliases": [
             "horário de início",
             "horario de inicio",
-            "hora início"
+            "hora início",
+            "horário início - atividade"
           ]
         },
         "fim": {
@@ -48,7 +50,8 @@
           "aliases": [
             "horário de término",
             "horario de termino",
-            "hora término"
+            "hora término",
+            "horário fim - atividade"
           ]
         }
       }

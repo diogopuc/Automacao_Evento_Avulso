@@ -76,6 +76,9 @@ def _summary_sheet(workbook: Workbook, summary: RunSummary) -> None:
         ("Eventos sem conflito", summary.no_conflicts),
         ("Eventos não verificados", summary.not_verified),
         ("Ocorrências de conflito", summary.conflict_occurrences),
+        ("Intrajornadas não conformes", summary.intra_irregular),
+        ("Interjornadas não conformes", summary.inter_irregular),
+        ("Descansos não verificados", summary.rest_not_verified),
     ]
     for row in rows:
         ws.append(row)
@@ -107,6 +110,7 @@ def export_report(output_dir: Path, summary: RunSummary, records: list[RequestRe
     _write_sheet(workbook, "Letivas", records)
     _simple_table(workbook, "Pendências", ["Categoria", "Origem", "Mensagem"], issues)
     _simple_table(workbook, "Arquivos processados", ["Pasta", "Arquivo", "Status", "Mensagem"], file_rows)
+    _simple_table(workbook, "Rastreabilidade", ["ID do registro", "Arquivo de origem", "Aba de origem", "Linha de origem"], [[record.record_id, safe_text(record.source_file), safe_text(record.source_sheet), record.source_row] for record in records])
     if details:
         _simple_table(workbook, "Detalhamento de conflitos", ["ID do registro", "Matrícula", "Data", "Início Evento", "Fim Evento", "Início DW", "Fim DW", "Tipo DW", "Atividade DW"], [[detail.request_id, detail.matricula, detail.activity_date, detail.event_start, detail.event_end, detail.dw_start, detail.dw_end, detail.dw_type, detail.dw_description] for detail in details])
     target = output_dir / "irregularidades_EV.xlsx"

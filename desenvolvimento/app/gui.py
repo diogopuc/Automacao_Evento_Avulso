@@ -105,7 +105,7 @@ class Application(ttk.Frame):
         ttk.Entry(coverage, textvariable=self.coverage_start, width=13).pack(side="left")
         ttk.Label(coverage, text="até", style="Body.TLabel").pack(side="left", padx=8)
         ttk.Entry(coverage, textvariable=self.coverage_end, width=13).pack(side="left")
-        ttk.Label(coverage, text="Opcional · DD/MM/AAAA", style="Hint.TLabel").pack(side="left", padx=10)
+        ttk.Label(coverage, text="DD/MM/AAAA · sem cobertura, não é possível confirmar ausência de conflitos", style="Hint.TLabel").pack(side="left", padx=10)
 
         tools = ttk.Frame(card, style="Card.TFrame")
         tools.pack(fill="x", pady=(12, 0))
@@ -149,8 +149,12 @@ class Application(ttk.Frame):
 
     def _coverage(self) -> Coverage:
         start, end = parse_date(self.coverage_start.get()), parse_date(self.coverage_end.get())
+        if (self.coverage_start.get().strip() and start is None) or (self.coverage_end.get().strip() and end is None):
+            raise ValueError("Datas de cobertura inválidas. Use DD/MM/AAAA.")
         if bool(start) != bool(end):
             raise ValueError("Informe as duas datas da cobertura ou deixe ambas em branco.")
+        if start and end and start > end:
+            raise ValueError("O início da cobertura deve ser anterior ou igual ao fim.")
         return Coverage(bool(start and end), start, end)
 
     def _append(self, text: str) -> None:
@@ -230,8 +234,15 @@ class Application(ttk.Frame):
     def run(self) -> None:
         try:
             coverage = self._coverage()
-        except ValueError as exc:
-            messagebox.showerror("Cobertura da base", str(exc))
+            profile = self._profile()
+            input_dir = Path(self.input_var.get())
+            output_dir = Path(self.output_var.get())
+            dw_file = Path(self.dw_file_var.get())
+            self.config_data["input_directory"] = self.input_var.get()
+            self.config_data["output_directory"] = self.output_var.get()
+            save_config(self.config_data)
+        except (ValueError, OSError) as exc:
+            messagebox.showerror("Configuração", str(exc))
             return
         self.token = CancellationToken()
         self.running = True
@@ -241,16 +252,12 @@ class Application(ttk.Frame):
         self.cancel_btn.configure(state="normal")
         self.open_report_btn.configure(state="disabled")
         self.progress["value"] = 0
-        self.config_data["input_directory"] = self.input_var.get()
-        self.config_data["output_directory"] = self.output_var.get()
-        save_config(self.config_data)
-
         def worker() -> None:
             execution_id = datetime.now().strftime("%Y%m%d%H%M%S")
-            logger = configure_logging(Path(self.output_var.get()) / "logs", execution_id, lambda message: self.events.put(("log", message)))
             try:
+                logger = configure_logging(output_dir / "logs", execution_id, lambda message: self.events.put(("log", message)))
                 processor = Processor(self.config_data, logger, lambda stage, percentage, current: self.events.put(("progress", (stage, percentage, current))))
-                result = processor.run(Path(self.input_var.get()), Path(self.output_var.get()), self._profile(), Path(self.dw_file_var.get()), coverage, self.token)
+                result = processor.run(input_dir, output_dir, profile, dw_file, coverage, self.token)
                 summary = processor.last_summary
                 message = f"{summary.status}. Letivas: {summary.letivas}; conflitos: {summary.conflicts}; sem conflito: {summary.no_conflicts}; não verificados: {summary.not_verified}. Relatório: {result.name}"
                 self.events.put(("done", (result, message)))

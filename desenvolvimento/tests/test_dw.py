@@ -1,6 +1,7 @@
 from datetime import date, time
 
 from openpyxl import Workbook
+import pytest
 
 from app.dw import inspect_dw_export, load_dw_export
 from app.models import CancellationToken
@@ -20,3 +21,14 @@ def test_dw_export_is_validated_and_filtered(tmp_path):
     assert len(records) == 1
     assert records[0].description == "Manter"
     assert records[0].start_time == time(8)
+
+
+def test_invalid_key_in_view_is_not_silently_filtered(tmp_path):
+    file = tmp_path / "base.xlsx"
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.append(["MATRICULA_ADP", "DATA", "HORARIO_INICIO HR Relogio", "HORARIO_FIM HR Relogio", "TIPO_ATIVIDADE", "DISCIPLINA_ATIVIDADE_NOME"])
+    sheet.append(["000123", "inválida", time(8), time(9), "Letiva", "Aula"])
+    workbook.save(file)
+    with pytest.raises(ValueError, match="Linha 2"):
+        load_dw_export(file, wanted_keys={("000123", date(2026, 10, 28))})

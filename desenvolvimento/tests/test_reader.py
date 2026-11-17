@@ -2,6 +2,7 @@ from datetime import date, time
 from pathlib import Path
 
 from openpyxl import Workbook
+import pytest
 
 from app.models import CancellationToken, Profile
 from app.reader import read_requests
@@ -35,3 +36,14 @@ def test_reader_reads_schedule_from_configured_columns(tmp_path: Path):
     assert records[0].matricula == "000123"
     assert records[0].start_time == time(8)
     assert not records[0].issues
+
+
+def test_ambiguous_duplicate_header_is_rejected(tmp_path: Path):
+    file = tmp_path / "ambiguo.xlsx"
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Solicitações"
+    sheet.append(["Matrícula", "Matrícula", "", "", "", "Data"])
+    workbook.save(file)
+    with pytest.raises(ValueError, match="não reconheceu"):
+        read_requests(file, profile(), CancellationToken())

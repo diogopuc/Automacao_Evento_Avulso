@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
+from uuid import uuid4
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -108,10 +110,17 @@ def export_report(output_dir: Path, summary: RunSummary, records: list[RequestRe
     _simple_table(workbook, "Arquivos processados", ["Pasta", "Arquivo", "Status", "Mensagem"], file_rows)
     if details:
         _simple_table(workbook, "Detalhamento de conflitos", ["ID do registro", "Matrícula", "Data", "Início Evento", "Fim Evento", "Início DW", "Fim DW", "Tipo DW", "Atividade DW"], [[detail.request_id, detail.matricula, detail.activity_date, detail.event_start, detail.event_end, detail.dw_start, detail.dw_end, detail.dw_type, detail.dw_description] for detail in details])
-    filename = f"consolidado_eventos_avulsos_{datetime.now():%Y%m%d_%H%M%S}_{summary.execution_id[:8]}.xlsx"
-    target = output_dir / filename
-    temporary = target.with_suffix(".tmp.xlsx")
-    workbook.save(temporary)
-    load_workbook(temporary, read_only=True).close()
-    os.replace(temporary, target)
+    target = output_dir / "irregularidades_EV.xlsx"
+    temporary = output_dir / f".irregularidades_EV_{uuid4().hex}.tmp.xlsx"
+    try:
+        workbook.save(temporary)
+        load_workbook(temporary, read_only=True).close()
+        if target.exists():
+            versions = output_dir / "versionamento"
+            versions.mkdir(exist_ok=True)
+            archive = versions / f"irregularidades_EV_{datetime.now():%Y%m%d_%H%M%S}_{uuid4().hex[:8]}.xlsx"
+            shutil.copy2(target, archive)
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
     return target

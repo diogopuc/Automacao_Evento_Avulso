@@ -20,6 +20,8 @@ Consulte [CHANGELOG.md](CHANGELOG.md) para o histórico de versões e alteraçõ
 4. Informe a cobertura da base apenas se quiser restringir as datas aceitas. Deixe em branco para comparar todas as solicitações válidas.
 5. Clique em **Executar**.
 
+O relatório atual é salvo em `resultados/irregularidades_EV.xlsx`. Antes de cada substituição, a versão anterior é copiada para `resultados/versionamento`.
+
 A aba **Letivas** traz o resultado por registro: `Conflito`, `Sem conflito` ou `Não verificado`. Os detalhes de cada conflito ficam na aba **Detalhamento de conflitos** quando houver ocorrências.
 
 ## Descansos entre jornadas

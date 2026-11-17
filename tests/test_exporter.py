@@ -19,3 +19,19 @@ def test_export_includes_conflict_result_without_duplicate_filters(tmp_path):
     with ZipFile(output) as archive:
         worksheet_xml = archive.read("xl/worksheets/sheet2.xml").decode("utf-8")
         assert "<autoFilter" not in worksheet_xml
+
+
+def test_export_preserves_previous_report_before_replacing_it(tmp_path):
+    first = RunSummary("first", "2026-11-17T08:00:00", "base")
+    second = RunSummary("second", "2026-11-17T09:00:00", "base")
+    target = export_report(tmp_path, first, [], [], [], [])
+    assert target.name == "irregularidades_EV.xlsx"
+    export_report(tmp_path, second, [], [], [], [])
+    archives = list((tmp_path / "versionamento").glob("*.xlsx"))
+    assert len(archives) == 1
+    old_workbook = load_workbook(archives[0], read_only=True)
+    assert old_workbook["Resumo"]["B1"].value == "first"
+    old_workbook.close()
+    current_workbook = load_workbook(target, read_only=True)
+    assert current_workbook["Resumo"]["B1"].value == "second"
+    current_workbook.close()

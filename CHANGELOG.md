@@ -6,6 +6,13 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.8.0 - 2026-11-17
+
+### Alterado
+
+- O relatório atual passou a ser salvo como `irregularidades_EV.xlsx`.
+- Antes de substituir o relatório atual, uma cópia identificada por data e hora é preservada na pasta `resultados/versionamento`.
+
 ## v1.7.0 - 2026-11-11
 
 ### Adicionado

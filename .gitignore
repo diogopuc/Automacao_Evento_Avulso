@@ -1,5 +1,10 @@
 
 /base_dw.xlsx
+/dados/base_dw.xlsx
 __pycache__/
 *.pyc
 resultados/
+build/
+dist/
+EventosAvulsos.spec
+/EventosAvulsos.exe

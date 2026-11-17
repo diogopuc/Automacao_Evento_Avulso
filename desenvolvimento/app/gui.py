@@ -32,7 +32,7 @@ class Application(ttk.Frame):
         root = application_root()
         self.input_var = tk.StringVar(value=self.config_data.get("input_directory") or str(root))
         self.output_var = tk.StringVar(value=self.config_data.get("output_directory") or str(root / "resultados"))
-        default_base = root / "base_dw.xlsx"
+        default_base = root / "dados" / "base_dw.xlsx"
         self.dw_file_var = tk.StringVar(value=str(default_base) if default_base.is_file() else "")
         self.profile_var = tk.StringVar()
         self.coverage_start = tk.StringVar()

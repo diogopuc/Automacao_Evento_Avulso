@@ -6,11 +6,19 @@ Consulte [CHANGELOG.md](CHANGELOG.md) para o histórico de versões e alteraçõ
 
 ## Instalação no Windows
 
+### Executável para usuários
+
+Copie `EventosAvulsos.exe` para uma pasta em que seu usuário possa gravar arquivos e abra-o com dois cliques. Python e as bibliotecas já estão incluídos; não é necessário instalá-los, baixá-los ou usar uma conta administradora. Coloque a pasta `1. LETIVA` junto ao executável e a base em `dados/base_dw.xlsx`, ou selecione os caminhos na tela. A configuração será criada em `config/config.json` e os relatórios em `resultados`. Não compartilhe o `config.json` pessoal, que pode conter caminhos específicos da sua máquina.
+
+### Execução pelo código-fonte
+
 1. Instale Python 3.11+ e marque **Add Python to PATH**.
-2. No PowerShell, dentro desta pasta, execute `py -3.11 -m venv .venv`, `.\.venv\Scripts\Activate.ps1` e `pip install -r requirements.txt`.
-3. Copie `config.example.json` para `config.json` e ajuste as pastas de origem, se necessário.
-4. Salve a exportação da view como `base_dw.xlsx` na raiz da automação, ou selecione outro arquivo pela interface.
-5. Execute `python main.py`.
+2. No PowerShell, na pasta `desenvolvimento`, crie e ative um ambiente virtual e execute `pip install -r requirements.txt`.
+3. Ajuste `config/config.json`, se necessário, usando `config/config.example.json` como referência.
+4. Salve a exportação da view como `dados/base_dw.xlsx`, ou selecione outro arquivo pela interface.
+5. Na pasta `desenvolvimento`, execute `python main.py`.
+
+Para gerar novamente o executável em Windows, execute na pasta `desenvolvimento`: `python -m PyInstaller --noconfirm --onefile --windowed --name EventosAvulsos --add-data "../config/config.example.json;." main.py`. O arquivo será criado em `desenvolvimento/dist` e deverá ser copiado para a raiz do projeto.
 
 ## Uso
 

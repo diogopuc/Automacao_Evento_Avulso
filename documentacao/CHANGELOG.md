@@ -6,6 +6,20 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.10.0 - 2026-11-17
+
+### Alterado
+
+- Organizada a raiz do projeto com o executável e pastas para dados, configuração, desenvolvimento e documentação.
+- A base padrão passou para `dados/base_dw.xlsx` e a configuração pessoal para `config/config.json`.
+
+## v1.9.0 - 2026-11-17
+
+### Adicionado
+
+- Executável Windows com Python, bibliotecas e configuração padrão incorporados, sem instalação de dependências pelo usuário.
+- Instruções para distribuição e execução sem privilégios de administrador.
+
 ## v1.8.2 - 2026-11-17
 
 ### Alterado

@@ -9,16 +9,18 @@ from .models import Profile, SourceFolder
 
 
 def application_root() -> Path:
-    return Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent.parent
+    return Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent.parent.parent
 
 
 def default_config_path() -> Path:
-    return application_root() / "config.json"
+    return application_root() / "config" / "config.json"
 
 
 def load_config(path: Path | None = None) -> dict[str, Any]:
     path = path or default_config_path()
-    example = application_root() / "config.example.json"
+    example = application_root() / "config" / "config.example.json"
+    if not example.exists() and getattr(sys, "frozen", False):
+        example = Path(sys._MEIPASS) / "config.example.json"
     source = path if path.exists() else example
     if not source.exists():
         raise FileNotFoundError(f"Configuração não encontrada: {source}")
@@ -27,6 +29,7 @@ def load_config(path: Path | None = None) -> dict[str, Any]:
 
 def save_config(config: dict[str, Any], path: Path | None = None) -> None:
     path = path or default_config_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
 
 

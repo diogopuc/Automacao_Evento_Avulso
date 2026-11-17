@@ -6,6 +6,13 @@ Este arquivo concentra as alterações funcionais do projeto. Use versionamento 
 - incremente o terceiro número para correções e ajustes sem mudança de escopo;
 - registre a versão mais recente no topo, com uma frase clara sobre o impacto da alteração.
 
+## v1.8.2 - 2026-11-17
+
+### Alterado
+
+- Ajustada a cor do cabeçalho do relatório para `#8A0538`.
+- Removida a coloração das linhas; somente as células de resultado com conflito ou não conformidade recebem destaque vermelho.
+
 ## v1.8.1 - 2026-11-17
 
 ### Alterado

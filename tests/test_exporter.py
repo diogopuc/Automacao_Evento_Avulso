@@ -35,3 +35,24 @@ def test_export_preserves_previous_report_before_replacing_it(tmp_path):
     current_workbook = load_workbook(target, read_only=True)
     assert current_workbook["Resumo"]["B1"].value == "second"
     current_workbook.close()
+
+
+def test_report_highlights_only_individual_conflict_cells(tmp_path):
+    record = RequestRecord(
+        {"Matrícula": "123"}, "123", date(2026, 10, 28), time(8), time(9), "id",
+        result_message="Conflito com atividade.",
+        intrajornada_message="Conforme - intervalo adequado.",
+        interjornada_message="Não conforme - descanso insuficiente.",
+    )
+    summary = RunSummary("exec", "2026-10-28T08:00:00", "base")
+    output = export_report(tmp_path, summary, [record], [], [], [])
+    workbook = load_workbook(output)
+    sheet = workbook["Letivas"]
+    headers = {cell.value: cell.column for cell in sheet[1]}
+    assert all(cell.fill.fgColor.rgb[-6:] == "8A0538" for cell in sheet[1])
+    assert sheet.cell(2, headers["Matrícula"]).fill.patternType is None
+    assert sheet.cell(2, headers["Resultado da verificação"]).fill.fgColor.rgb[-6:] == "FF0000"
+    assert sheet.cell(2, headers["Validação intrajornada"]).fill.patternType is None
+    assert sheet.cell(2, headers["Validação interjornada"]).fill.fgColor.rgb[-6:] == "FF0000"
+    assert not next(iter(sheet.tables.values())).tableStyleInfo.showRowStripes
+    workbook.close()

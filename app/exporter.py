@@ -14,11 +14,9 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from .models import ConflictDetail, RequestRecord, RunSummary
 from .normalize import safe_text
 
-HEADER = PatternFill("solid", fgColor="1F4E78")
+HEADER = PatternFill("solid", fgColor="8A0538")
 WHITE = Font(color="FFFFFF", bold=True)
-GREEN = PatternFill("solid", fgColor="E2F0D9")
-RED = PatternFill("solid", fgColor="FCE4D6")
-YELLOW = PatternFill("solid", fgColor="FFF2CC")
+RED = PatternFill("solid", fgColor="FF0000")
 RESULT_TYPE = "Tipo da atividade em conflito"
 RESULT_MESSAGE = "Resultado da verificação"
 INTRAJORNADA = "Validação intrajornada"
@@ -43,10 +41,11 @@ def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -
     for row in range(2, ws.max_row + 1):
         for header in (RESULT_TYPE, RESULT_MESSAGE, INTRAJORNADA, INTERJORNADA):
             ws.cell(row, headers.index(header) + 1).alignment = Alignment(wrap_text=True, vertical="top")
-        messages = [str(ws.cell(row, headers.index(header) + 1).value or "") for header in (RESULT_MESSAGE, INTRAJORNADA, INTERJORNADA)]
-        fill = RED if any(message.startswith(("Conflito", "Não conforme")) for message in messages) else GREEN if all(message.startswith("Conforme") or message == "Sem conflito." for message in messages) else YELLOW
-        for cell in ws[row]:
-            cell.fill = fill
+        for header in (RESULT_MESSAGE, INTRAJORNADA, INTERJORNADA):
+            cell = ws.cell(row, headers.index(header) + 1)
+            if str(cell.value or "").startswith(("Conflito", "Não conforme")):
+                cell.fill = RED
+                cell.font = Font(color="FFFFFF")
     for index, header in enumerate(headers, 1):
         lengths = [len(str(header))] + [len(str(ws.cell(row, index).value or "")) for row in range(2, min(ws.max_row, 100) + 1)]
         ws.column_dimensions[get_column_letter(index)].width = min(max(max(lengths) + 2, 12), 55)
@@ -56,7 +55,7 @@ def _write_sheet(workbook: Workbook, title: str, records: list[RequestRecord]) -
                 cell.number_format = "DD/MM/YYYY HH:MM"
     if ws.max_row > 1:
         table = Table(displayName=f"Tabela{title.replace(' ', '').replace('ã', 'a')}", ref=ws.dimensions)
-        table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium2", showRowStripes=True)
+        table.tableStyleInfo = TableStyleInfo(name=None, showRowStripes=False, showColumnStripes=False)
         ws.add_table(table)
     else:
         ws.auto_filter.ref = ws.dimensions
